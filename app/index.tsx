@@ -1,15 +1,26 @@
-import { Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { Text, Center, VStack } from "@/components/ui";
+import { router } from "expo-router";
 
-export default function Index() {
+const Index = () => {
+  // set timeout and push to login screen
+  useEffect(() => {
+    setTimeout(() => {
+      router.push("" as any);
+    }, 3000);
+  }, []);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
+    <Center className="flex-1 bg-IndianRed">
+      <VStack className="items-center mt-[240] flex-1">
+        <Text className="text-white">Safety Pro</Text>
+        <Text className="text-white">Safety First, Safety Always</Text>
+      </VStack>
+      <VStack className="mt-4">
+        <Text>Sanux Technologies</Text>
+      </VStack>
+    </Center>
   );
-}
+};
+
+export default Index;
