@@ -6,7 +6,7 @@ const Index = () => {
   // set timeout and push to login screen
   useEffect(() => {
     setTimeout(() => {
-      router.push("" as any);
+      router.push("auth/signin" as any);
     }, 3000);
   }, []);
 
