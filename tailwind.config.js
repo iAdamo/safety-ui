@@ -7,7 +7,7 @@ module.exports = {
     "./app/**/*.{tsx,jsx,ts,js}",
     "./components/**/*.{tsx,jsx,ts,js}",
     "./components/*.{js,jsx,ts,tsx,mdx}",
-    "./screens/**/*.{js,jsx,ts,tsx}"
+    "./screens/**/*.{js,jsx,ts,tsx}",
   ],
   presets: [require("nativewind/preset")],
   safelist: [
@@ -19,11 +19,31 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        Crimson: "#DC143C",
-        GhostWite: "#F8F8FF",
-        SteelBlue: "#4682B4",
-        Khaki: "#F0E68C",
-        IndianRed: "#CD5C5C",
+        Crimson: {
+          DEFAULT: "#DC143C",
+          600: "#C11237",
+          700: "#A10E2F",
+        },
+        GhostWhite: {
+          DEFAULT: "#F8F8FF",
+          600: "#E0E0E0",
+          700: "#C8C8C8",
+        },
+        SteelBlue: {
+          DEFAULT: "#4682B4",
+          600: "#3A76A8",
+          700: "#326A9C",
+        },
+        Khaki: {
+          DEFAULT: "#F0E68C",
+          600: "#D7C76B",
+          700: "#BFB05E",
+        },
+        IndianRed: {
+          DEFAULT: "#CD5C5C",
+          600: "#B55252",
+          700: "#9C4747",
+        },
         Teal: "#008080",
         primary: {
           0: "rgb(var(--color-primary-0)/<alpha-value>)",

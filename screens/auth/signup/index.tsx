@@ -45,7 +45,7 @@ const SignUp = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema.omit({ code: true })),
   });
 
@@ -266,7 +266,7 @@ const SignUp = () => {
             {/* ----------------------------------- Sign Up Button ------------------------------------------ */}
             <VStack className="w-80 mt-5">
               <Button
-                className="w-full h-12 bg-Teal"
+                className="w-full h-12 bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
                 onPress={handleSubmit(onSubmit)}
               >
                 <ButtonText className="font-medium">Sign up</ButtonText>
@@ -278,7 +278,7 @@ const SignUp = () => {
           <VStack className="flex-1 justify-center items-center">
             <Text size="md">Already have an account?</Text>
             <Button
-              className="bg-IndianRed w-52"
+              className="bg-IndianRed w-52 data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
               size="md"
               onPress={() => router.push("/auth/signin")}
             >

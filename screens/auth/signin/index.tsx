@@ -8,6 +8,7 @@ import {
   formSchema,
   FormSchemaType,
 } from "@/components/forms/schemas/FormSchema";
+import ForgotPasswordModal from "@/components/modals/ForgotPasswordModal";
 
 import {
   VStack,
@@ -45,6 +46,7 @@ type ControllerRenderType = {
 };
 
 const Login = () => {
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const router = useRouter();
   const toast = useToast();
 
@@ -212,14 +214,15 @@ const Login = () => {
           </FormControl>
           <VStack className="w-80 ">
             <Button
-              className="bg-IndianRed w-full h-12"
+              className="w-full h-12 bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
               onPress={handleSubmit(onSubmit)}
             >
               <ButtonText className="font-medium">Log In</ButtonText>
             </Button>
           </VStack>
           <HStack>
-            <Link>
+            <Link onPress={() => setShowForgotPasswordModal(true)}>
+              {" "}
               <LinkText className="font-medium text-sm text-primary-700 group-hover/link:text-primary-600">
                 Forgot Password?
               </LinkText>
@@ -230,9 +233,9 @@ const Login = () => {
       <VStack className="flex-1 justify-center items-center">
         <Text size="md">Don't have an account?</Text>
         <Button
-          className="bg-Teal w-52"
+          className="bg-Teal w-52 data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
           size="md"
-          onPress={() => router.push("auth/signup")}
+          onPress={() => router.push("/auth/signup")}
         >
           <ButtonText>Create New Account</ButtonText>
         </Button>
@@ -240,6 +243,12 @@ const Login = () => {
       <Center className="">
         <Text className="">Sanux Technologies</Text>
       </Center>
+      {showForgotPasswordModal && (
+        <ForgotPasswordModal
+          isOpen={showForgotPasswordModal}
+          onClose={() => setShowForgotPasswordModal(false)}
+        />
+      )}
     </Box>
   );
 };
