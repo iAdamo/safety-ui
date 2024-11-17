@@ -54,7 +54,9 @@ const Login = () => {
     reset,
     formState: { errors },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(
+      formSchema.omit({ confirmPassword: true, code: true })
+    ),
   });
 
   const [validated, setValidated] = React.useState({
@@ -230,7 +232,7 @@ const Login = () => {
         <Button
           className="bg-Teal w-52"
           size="md"
-          onPress={() => router.push("/auth/signup")}
+          onPress={() => router.push("auth/signup")}
         >
           <ButtonText>Create New Account</ButtonText>
         </Button>

@@ -1,2 +1,2 @@
-import { Login } from "../../screens/auth/signin";
+import { Login } from "@/screens/auth/signin";
 export default Login;

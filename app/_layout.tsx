@@ -9,6 +9,7 @@ export default function RootLayout() {
         <StatusBar barStyle="light-content" translucent={true} />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="auth/signin" />
+          <Stack.Screen name="auth/signup" />
         </Stack>
     </GluestackUIProvider>
   );
