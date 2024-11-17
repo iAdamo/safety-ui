@@ -10,17 +10,12 @@ interface AuthData {
   password: string;
 }
 
-/**
- *
- * @param data  {email, password}
- * @returns  response.data
- */
 export interface RegisterResponse {
   id: string;
   email: string;
 }
 
-export const createUser = async (data: AuthData) => {
+export const registerUser = async (data: AuthData) => {
   try {
     const response = await authAxios.post("register/", data);
     return response.data;
@@ -41,10 +36,10 @@ export const verifyEmail = async (data: { email: string; code: string }) => {
   }
 };
 
-// Resend verification email
-export const resendEmail = async (data: { email: string }) => {
+// Resend verification code
+export const sendCode = async (data: { email: string }) => {
   try {
-    const response = await authAxios.post("resend-verification/", data);
+    const response = await authAxios.post("send-code/", data);
     return response.data;
   } catch (err) {
     console.error(err);
@@ -78,3 +73,13 @@ export const logoutUser = async () => {
     throw err;
   }
 };
+
+export const resetPassword = async (data: {email: string; password: string}) => {
+  try {
+    const response = await authAxios.post("reset-password/", data);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}

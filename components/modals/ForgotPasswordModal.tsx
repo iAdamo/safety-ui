@@ -4,7 +4,7 @@ import {
   FormSchemaType,
 } from "@/components/forms/schemas/FormSchema";
 import { FormModal } from "../forms/FormModal";
-import { resendEmail } from "@/api/authHelper";
+import { sendCode, resetPassword } from "@/api/authHelper";
 import { verifyEmail } from "@/api/authHelper";
 import { Toast, ToastTitle, useToast } from "@/components/ui";
 import { Keyboard } from "react-native";
@@ -30,7 +30,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
   const handleSendCode = async (data: FormSchemaType) => {
     try {
-      const response = await resendEmail({ email: data.email });
+      const response = await sendCode({ email: data.email });
       if (response) {
         toast.show({
           placement: "top",

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { formSchema, FormSchemaType } from "@/components/forms/schemas/FormSchema";
 import { FormModal } from "../forms/FormModal";
-import { resendEmail, verifyEmail } from "@/api/authHelper";
+import { sendCode, verifyEmail } from "@/api/authHelper";
 import { Toast, ToastTitle, useToast } from "@/components/ui";
 import { Keyboard } from "react-native";
 
@@ -21,7 +21,7 @@ const VerifyCodeModal: React.FC<VerifyCodeModalProps> = ({ isOpen, onClose, emai
 
   const handleSendCode = async () => {
     try {
-      const response = await resendEmail({ email });
+      const response = await sendCode({ email });
       if (response) {
         toast.show({
           placement: "top",

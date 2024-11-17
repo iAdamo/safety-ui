@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createUser, RegisterResponse } from "@/api/authHelper";
+import { registerUser, RegisterResponse } from "@/api/authHelper";
 import { AlertTriangle } from "lucide-react-native";
 import {
   formSchema,
@@ -43,8 +43,8 @@ const SignUp = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  getValues,
-} = useForm<FormSchemaType>({
+    getValues,
+  } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema.omit({ code: true })),
   });
 
@@ -66,11 +66,11 @@ const SignUp = () => {
       });
     } else {
       try {
-        const response = (await createUser({
+        const response = (await registerUser({
           email: data.email,
           password: data.password,
         })) as RegisterResponse;
-        if (!response) {
+        if (response) {
           toast.show({
             placement: "top",
             duration: 3000,
@@ -96,7 +96,6 @@ const SignUp = () => {
             );
           },
         });
-        setShowVerifyEmailModal(true);
       }
     }
   };
@@ -119,11 +118,11 @@ const SignUp = () => {
   };
 
   return (
-    <Box className="flex-1 bg-white ">
+    <Box className="flex-1">
       <SafeAreaView className="flex h-[160px] bg-Teal"></SafeAreaView>
       <VStack className="flex-1 max-w-full pt-10 flex-col justify-center">
-        <VStack className="flex-col bg-white items-center">
-          <VStack className="bg-white border-1 shadow-hard-5 p-5 pb-0 flex-col items-center">
+        <VStack className="flex-col items-center">
+          <VStack className="border-1 shadow-hard-5 p-5 pb-0 flex-col items-center">
             {/* ----------------------------------- Sign Up ------------------------------------------ */}
             <FormControl className=" w-80" isInvalid={!!errors?.email}>
               <FormControlLabel>
