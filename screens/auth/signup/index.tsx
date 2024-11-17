@@ -8,6 +8,7 @@ import {
   formSchema,
   FormSchemaType,
 } from "@/components/forms/schemas/FormSchema";
+import { VerifyCodeModal } from "@/components/modals/VerifyEmailModal";
 import {
   VStack,
   HStack,
@@ -32,20 +33,18 @@ import {
   ButtonText,
 } from "@/components/ui";
 
-import {
-  EyeIcon,
-  EyeOffIcon,
-  Icon,
-} from "@/components/ui";
+import { EyeIcon, EyeOffIcon, Icon } from "@/components/ui";
 import { Keyboard } from "react-native";
 
 const SignUp = () => {
+  const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<FormSchemaType>({
+  getValues,
+} = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema.omit({ code: true })),
   });
 
@@ -66,12 +65,12 @@ const SignUp = () => {
         },
       });
     } else {
-      const response = (await createUser({
-        email: data.email,
-        password: data.password,
-      })) as RegisterResponse;
       try {
-        if (response) {
+        const response = (await createUser({
+          email: data.email,
+          password: data.password,
+        })) as RegisterResponse;
+        if (!response) {
           toast.show({
             placement: "top",
             duration: 3000,
@@ -83,7 +82,7 @@ const SignUp = () => {
               );
             },
           });
-          router.push("/");
+          setShowVerifyEmailModal(true);
         }
       } catch (error) {
         toast.show({
@@ -92,11 +91,12 @@ const SignUp = () => {
           render: ({ id }) => {
             return (
               <Toast nativeID={id} variant="outline" action="error">
-                <ToastTitle>{error as string}</ToastTitle>
+                <ToastTitle>{(error as Error).message}</ToastTitle>
               </Toast>
             );
           },
         });
+        setShowVerifyEmailModal(true);
       }
     }
   };
@@ -290,6 +290,13 @@ const SignUp = () => {
           <Text className="">Sanux Technologies</Text>
         </Center>
       </VStack>
+      {showVerifyEmailModal && (
+        <VerifyCodeModal
+          email={getValues("email")}
+          isOpen={showVerifyEmailModal}
+          onClose={() => setShowVerifyEmailModal(false)}
+        />
+      )}
     </Box>
   );
 };
