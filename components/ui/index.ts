@@ -16,3 +16,4 @@ export * from "./spinner";
 export * from "./heading";
 export * from "./modal";
 export * from "./utils/use-media-query";
+export * from "./card";

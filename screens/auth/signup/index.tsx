@@ -31,12 +31,29 @@ import {
   InputIcon,
   Button,
   ButtonText,
+  useMediaQuery,
 } from "@/components/ui";
 
 import { EyeIcon, EyeOffIcon, Icon } from "@/components/ui";
 import { Keyboard } from "react-native";
 
 const SignUp = () => {
+  const [isMobile, isTablet, isSmallScreen, isLargeScreen] = useMediaQuery([
+    {
+      maxWidth: 480,
+    },
+    {
+      minWidth: 481,
+      maxWidth: 768,
+    },
+    {
+      minWidth: 769,
+      maxWidth: 1440,
+    },
+    {
+      minWidth: 1441,
+    },
+  ]);
   const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
   const {
     control,
@@ -119,8 +136,17 @@ const SignUp = () => {
 
   return (
     <Box className="flex-1">
-      <SafeAreaView className="flex h-[160px] bg-Teal"></SafeAreaView>
-      <VStack className="flex-1 max-w-full pt-10 flex-col justify-center">
+      {isMobile && (
+        <SafeAreaView className="flex h-[160px] bg-Teal"></SafeAreaView>
+      )}
+      {!isMobile && (
+        <Box className="hidden md:flex md:flex-col md:w-1/4 md:h-full md:bg-Teal md:fixed md:left-0"></Box>
+      )}
+      <VStack
+        className={`flex-1 max-w-full flex-col justify-center ${
+          isMobile ? "pt-10" : "pt-20 md:ml-1/4"
+        }`}
+      >
         <VStack className="flex-col items-center">
           <VStack className="border-1 shadow-hard-5 p-5 pb-0 flex-col items-center">
             {/* ----------------------------------- Sign Up ------------------------------------------ */}
@@ -263,7 +289,7 @@ const SignUp = () => {
               </FormControlError>
             </FormControl>
             {/* ----------------------------------- Sign Up Button ------------------------------------------ */}
-            <VStack className="w-80 mt-5">
+            <VStack className="w-80 my-5">
               <Button
                 className="w-full h-12 bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
                 onPress={handleSubmit(onSubmit)}
@@ -286,7 +312,12 @@ const SignUp = () => {
           </VStack>
         </VStack>
         <Center className="">
-          <Text className="">Sanux Technologies</Text>
+          <Text size="2xs" className="text-primary-100">
+            Powered By
+          </Text>
+          <Text size="2xs" className="text-primary-100">
+            Sanux Technologies
+          </Text>
         </Center>
       </VStack>
       {showVerifyEmailModal && (

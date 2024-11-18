@@ -10,6 +10,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="auth/signin" />
           <Stack.Screen name="auth/signup" />
+          <Stack.Screen name="dashboard/feeds" />
         </Stack>
     </GluestackUIProvider>
   );

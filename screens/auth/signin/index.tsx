@@ -76,6 +76,7 @@ const Login = () => {
         //email: data.email,
         //});
         setValidated({ emailValid: true, passwordValid: true });
+        router.push("/auth/dashboard");
         toast.show({
           placement: "top",
           duration: 10000,
@@ -89,6 +90,7 @@ const Login = () => {
         });
       }
     } catch (error) {
+      router.push("/dashboard/feeds");
       setValidated({ emailValid: false, passwordValid: false });
       toast.show({
         placement: "top",
@@ -241,7 +243,7 @@ const Login = () => {
         </Button>
       </VStack>
       <Center className="">
-        <Text className="">Sanux Technologies</Text>
+        <Text size="2xs" className="text-primary-100">Sanux Technologies</Text>
       </Center>
       {showForgotPasswordModal && (
         <ForgotPasswordModal
