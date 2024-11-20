@@ -76,7 +76,7 @@ const Login = () => {
         //email: data.email,
         //});
         setValidated({ emailValid: true, passwordValid: true });
-        router.push("/auth/dashboard");
+        router.push("/dashboard/feeds");
         toast.show({
           placement: "top",
           duration: 10000,
@@ -224,7 +224,6 @@ const Login = () => {
           </VStack>
           <HStack>
             <Link onPress={() => setShowForgotPasswordModal(true)}>
-              {" "}
               <LinkText className="font-medium text-sm text-primary-700 group-hover/link:text-primary-600">
                 Forgot Password?
               </LinkText>
@@ -243,7 +242,9 @@ const Login = () => {
         </Button>
       </VStack>
       <Center className="">
-        <Text size="2xs" className="text-primary-100">Sanux Technologies</Text>
+        <Text size="2xs" className="text-primary-100">
+          Sanux Technologies
+        </Text>
       </Center>
       {showForgotPasswordModal && (
         <ForgotPasswordModal

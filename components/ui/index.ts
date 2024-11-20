@@ -17,3 +17,4 @@ export * from "./heading";
 export * from "./modal";
 export * from "./utils/use-media-query";
 export * from "./card";
+export * from "./tooltip";

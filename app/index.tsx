@@ -12,9 +12,9 @@ const Index = () => {
 
   return (
     <Center className="flex-1 bg-IndianRed">
-      <VStack className="items-center mt-[240] flex-1">
-        <Text className="text-white">Safety Pro</Text>
-        <Text className="text-white">Safety First, Safety Always</Text>
+      <VStack className="items-center mt-[240] flex-1 gap-5">
+        <Text className="text-white" size="6xl">Safety Pro</Text>
+        <Text className="text-white" size="2xl">Safety First, Safety Always</Text>
       </VStack>
       <VStack className="mt-4">
         <Text>Sanux Technologies</Text>

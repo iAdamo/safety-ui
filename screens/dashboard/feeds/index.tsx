@@ -20,12 +20,20 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Tooltip,
+  TooltipContent,
+  TooltipText,
 } from "@/components/ui";
-import { ArrowLeftIcon, PlusIcon } from "lucide-react-native";
+import { ArrowLeftIcon, PlusIcon, MapPinIcon } from "lucide-react-native";
+import { EditIcon, TrashIcon } from "lucide-react-native";
 
 const Feeds = () => {
-  const [feeds, setFeeds] = useState<{ id: number; title: string; body: string }[]>([]);
-  const [modalVisible, setModalVisible] = useState<{ [key: number]: boolean }>({});
+  const [feeds, setFeeds] = useState<
+    { id: number; title: string; body: string }[]
+  >([]);
+  const [modalVisible, setModalVisible] = useState<{ [key: number]: boolean }>(
+    {}
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -47,15 +55,21 @@ const Feeds = () => {
   return (
     <Box className="flex-1">
       <SafeAreaView className="h-32 bg-SteelBlue border-0 shadow-hard-5-indianred"></SafeAreaView>
-      <VStack className="flex-1 bg-Teal p-5">
-        <VStack className="bg-red-400 h-full p-3">
-          <ScrollView className="bg-blue-600 flex-col pt-3 mb-10" showsVerticalScrollIndicator={false}>
+      <VStack className="flex-1 p-5">
+        <VStack className="h-full p-3">
+          <ScrollView
+            className="flex-col h-full pt-3"
+            showsVerticalScrollIndicator={false}
+          >
             {feeds.map((feed) => (
               <TouchableOpacity
                 key={feed.id}
                 onPress={() => handleCardPress(feed.id)}
               >
-                <Card variant="elevated" className="mx-10 mb-3">
+                <Card
+                  variant="elevated"
+                  className="mx-10 mb-3 shadow-hard-5 bg-primary"
+                >
                   <Heading size="md" className="mb-1">
                     {feed.title}
                   </Heading>
@@ -73,7 +87,9 @@ const Feeds = () => {
                     <ModalHeader className="flex-col items-start gap-0.5">
                       <Heading>{feed.title}</Heading>
                       <Text>{feed.body}</Text>
-                      <ModalCloseButton onPress={() => handleCloseModal(feed.id)} />
+                      <ModalCloseButton
+                        onPress={() => handleCloseModal(feed.id)}
+                      />
                     </ModalHeader>
                     <ModalBody className="mb-4">
                       <Text>Additional content for {feed.title}</Text>
@@ -105,14 +121,65 @@ const Feeds = () => {
           </ScrollView>
         </VStack>
       </VStack>
-      <VStack className="h-20 bg-SteelBlue border-0 shadow-hard-5-steelblue absolute bottom-0 w-full">
-        <Button
-          className="absolute bottom-5 right-5 w-16 h-16 rounded-full bg-Khaki data-[hover=true]:bg-Khaki-600 data-[active=true]:bg-Khaki-700"
-          onPress={() => router.push("/auth/signup")}
-        >
-          <ButtonIcon as={PlusIcon} />
-        </Button>
-      </VStack>
+      <VStack className="h-16 bg-SteelBlue border-0 shadow-hard-5-steelblue absolute bottom-0 w-full"></VStack>
+      <Box className="absolute bottom-20 right-5">
+        <VStack space="md">
+          <Tooltip
+            placement="left"
+            trigger={(triggerProps) => (
+              <Button
+                className="w-16 h-16 rounded-full bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
+                onPress={() => router.push("/auth/signup")}
+                {...triggerProps}
+              >
+                <ButtonIcon as={PlusIcon} />
+              </Button>
+            )}
+          >
+            <TooltipContent className="bg-background-50 rounded-md">
+              <Box className="p-2.5">
+                <Text size="sm">Add</Text>
+              </Box>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip
+            placement="left"
+            trigger={(triggerProps) => (
+              <Button
+                className="w-16 h-16 rounded-full bg-Khaki data-[hover=true]:bg-Khaki-600 data-[active=true]:bg-Khaki-700 shadow-hard-5"
+                onPress={() => router.push("/auth/edit")}
+                {...triggerProps}
+              >
+                <ButtonIcon as={EditIcon} />
+              </Button>
+            )}
+          >
+            <TooltipContent className="bg-background-50 rounded-md">
+              <Box className="p-2.5">
+                <Text size="sm">Edit</Text>
+              </Box>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip
+            placement="left"
+            trigger={(triggerProps) => (
+              <Button
+                className="w-16 h-16 rounded-full bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
+                onPress={() => router.push("/auth/delete")}
+                {...triggerProps}
+              >
+                <ButtonIcon as={MapPinIcon} />
+              </Button>
+            )}
+          >
+            <TooltipContent className="bg-background-50 rounded-md">
+              <Box className="p-2.5">
+                <Text size="sm">Mark Unsafe Zone</Text>
+              </Box>
+            </TooltipContent>
+          </Tooltip>
+        </VStack>
+      </Box>
     </Box>
   );
 };
