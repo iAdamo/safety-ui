@@ -90,7 +90,6 @@ const Login = () => {
         });
       }
     } catch (error) {
-      router.push("/dashboard/feeds");
       setValidated({ emailValid: false, passwordValid: false });
       toast.show({
         placement: "top",

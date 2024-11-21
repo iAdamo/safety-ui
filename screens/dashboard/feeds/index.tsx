@@ -54,7 +54,7 @@ const Feeds = () => {
 
   return (
     <Box className="flex-1">
-      <SafeAreaView className="h-32 bg-SteelBlue border-0 shadow-hard-5-indianred"></SafeAreaView>
+      <SafeAreaView className="h-40 bg-SteelBlue border-0 shadow-hard-5-indianred"></SafeAreaView>
       <VStack className="flex-1 p-5">
         <VStack className="h-full p-3">
           <ScrollView
@@ -162,15 +162,16 @@ const Feeds = () => {
           </Tooltip>
           <Tooltip
             placement="left"
-            trigger={(triggerProps) => (
-              <Button
-                className="w-16 h-16 rounded-full bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
-                onPress={() => router.push("/auth/delete")}
-                {...triggerProps}
-              >
-                <ButtonIcon as={MapPinIcon} />
-              </Button>
-            )}
+            trigger={(triggerProps) => {
+              return (
+                <Button
+                  className="w-16 h-16 rounded-full bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
+                  {...triggerProps}
+                  onPress={() => router.push("/dashboard/map")}
+                >
+                  <ButtonIcon as={MapPinIcon} />
+                </Button>
+              );}}
           >
             <TooltipContent className="bg-background-50 rounded-md">
               <Box className="p-2.5">
