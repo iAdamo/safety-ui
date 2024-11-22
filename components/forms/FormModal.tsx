@@ -74,8 +74,6 @@ export const FormModal: React.FC<FormModalProps> = ({
     handleSubmit(onSubmit)();
   };
 
-  console.log("errors", errors);
-
   return (
     <Modal
       isOpen={isOpen}
@@ -146,7 +144,7 @@ export const FormModal: React.FC<FormModalProps> = ({
           {extraText && (
             <Text size="sm" className="">
               {extraText}
-              <Link onPress={handleSubmit(onSubmit_2)} className="">
+              <Link onPress={onSubmit_2} className="">
                 <LinkText
                   size="xs"
                   className="text-typography-700 font-semibold"

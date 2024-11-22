@@ -9,6 +9,7 @@ import {
   FormSchemaType,
 } from "@/components/forms/schemas/FormSchema";
 import { VerifyCodeModal } from "@/components/modals/VerifyEmailModal";
+import { sendCode } from "@/api/authHelper";
 import {
   VStack,
   HStack,
@@ -88,6 +89,7 @@ const SignUp = () => {
           password: data.password,
         })) as RegisterResponse;
         if (response) {
+          await sendCode({ email: data.email });
           toast.show({
             placement: "top",
             duration: 3000,
@@ -108,7 +110,9 @@ const SignUp = () => {
           render: ({ id }) => {
             return (
               <Toast nativeID={id} variant="outline" action="error">
-                <ToastTitle>{(error as Error).message}</ToastTitle>
+                <ToastTitle>
+                  {(error as any).response?.data?.message}
+                </ToastTitle>
               </Toast>
             );
           },

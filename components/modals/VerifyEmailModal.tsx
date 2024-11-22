@@ -4,6 +4,8 @@ import { FormModal } from "../forms/FormModal";
 import { sendCode, verifyEmail } from "@/api/authHelper";
 import { Toast, ToastTitle, useToast } from "@/components/ui";
 import { Keyboard } from "react-native";
+import { useRouter } from "expo-router";
+import { useAuth } from "@/context/authcontext";
 
 interface VerifyCodeModalProps {
   isOpen: boolean;
@@ -14,6 +16,9 @@ interface VerifyCodeModalProps {
 const VerifyCodeModal: React.FC<VerifyCodeModalProps> = ({ isOpen, onClose, email }) => {
   const [showModal, setShowModal] = useState(isOpen);
   const toast = useToast();
+  const router = useRouter();
+
+  const { setAuthData } = useAuth();
 
   useEffect(() => {
     setShowModal(isOpen);
@@ -40,7 +45,7 @@ const VerifyCodeModal: React.FC<VerifyCodeModalProps> = ({ isOpen, onClose, emai
         duration: 3000,
         render: ({ id }) => (
           <Toast nativeID={id} variant="outline" action="error">
-            <ToastTitle>{String(error)}</ToastTitle>
+            <ToastTitle>{(error as any).response?.data?.message}</ToastTitle>
           </Toast>
         ),
       });
@@ -54,6 +59,13 @@ const VerifyCodeModal: React.FC<VerifyCodeModalProps> = ({ isOpen, onClose, emai
         code: data.code,
       });
       if (response) {
+        setAuthData((prev) => ({
+          ...prev,
+          userId: response.id,
+          active: true,
+          userEmail: response.email,
+        }));
+        router.push("/dashboard/feeds");
         toast.show({
           placement: "top",
           duration: 3000,
@@ -73,7 +85,7 @@ const VerifyCodeModal: React.FC<VerifyCodeModalProps> = ({ isOpen, onClose, emai
         duration: 3000,
         render: ({ id }) => (
           <Toast nativeID={id} variant="outline" action="error">
-            <ToastTitle>{(error as Error).message}</ToastTitle>
+            <ToastTitle>{(error as any).response?.data?.message}</ToastTitle>
           </Toast>
         ),
       });

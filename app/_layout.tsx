@@ -2,10 +2,12 @@ import { Stack } from "expo-router";
 import { StatusBar } from "react-native";
 import "@/global.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { AuthProvider } from "@/context/authcontext";
 
 export default function RootLayout() {
   return (
     <GluestackUIProvider >
+      <AuthProvider>
         <StatusBar barStyle="dark-content" translucent={true} />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="auth/signin" />
@@ -13,6 +15,7 @@ export default function RootLayout() {
           <Stack.Screen name="dashboard/feeds" />
           <Stack.Screen name="dashboard/map" />
         </Stack>
+      </AuthProvider>
     </GluestackUIProvider>
   );
 }

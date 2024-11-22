@@ -50,10 +50,12 @@ export const sendCode = async (data: { email: string }) => {
 export interface LoginResponse {
   id: string;
   email: string;
+  verified: boolean;
 }
 
 export const loginUser = async (data: AuthData) => {
   try {
+    console.log(data);
     const response = await authAxios.post("login/", data, {
       withCredentials: true,
     });

@@ -9,7 +9,7 @@ import {
   FormSchemaType,
 } from "@/components/forms/schemas/FormSchema";
 import ForgotPasswordModal from "@/components/modals/ForgotPasswordModal";
-
+import { VerifyCodeModal } from "@/components/modals/VerifyEmailModal";
 import {
   VStack,
   HStack,
@@ -47,6 +47,9 @@ type ControllerRenderType = {
 
 const Login = () => {
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const router = useRouter();
   const toast = useToast();
 
@@ -54,6 +57,7 @@ const Login = () => {
     control,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(
@@ -70,12 +74,11 @@ const Login = () => {
     try {
       const response = (await loginUser(data)) as LoginResponse;
       if (response) {
-        //setAuthData({
-        //userId: response.id,
-        //active: true,
-        //email: data.email,
-        //});
         setValidated({ emailValid: true, passwordValid: true });
+        if (!response.verified) {
+          setShowVerifyEmailModal(true);
+          return;
+        }
         router.push("/dashboard/feeds");
         toast.show({
           placement: "top",
@@ -91,13 +94,16 @@ const Login = () => {
       }
     } catch (error) {
       setValidated({ emailValid: false, passwordValid: false });
+      setErrorMessage(
+        (error as any).response?.data?.message || "An unexpected error occurred"
+      );
       toast.show({
         placement: "top",
         duration: 10000,
         render: ({ id }) => {
           return (
             <Toast nativeID={id} variant="outline" action="error">
-              <ToastTitle>{(error as Error).message}</ToastTitle>
+              <ToastTitle>{(error as any).response?.data?.message}</ToastTitle>
             </Toast>
           );
         },
@@ -162,7 +168,7 @@ const Login = () => {
               <FormControlErrorIcon as={AlertTriangle} />
               <FormControlErrorText>
                 {errors?.email?.message ||
-                  (!validated.emailValid && "Email ID not found")}
+                  (!validated.emailValid && errorMessage)}
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
@@ -209,7 +215,7 @@ const Login = () => {
               <FormControlErrorIcon as={AlertTriangle} />
               <FormControlErrorText>
                 {errors?.password?.message ||
-                  (!validated.passwordValid && "Password was incorrect")}
+                  (!validated.passwordValid && errorMessage)}
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
@@ -249,6 +255,13 @@ const Login = () => {
         <ForgotPasswordModal
           isOpen={showForgotPasswordModal}
           onClose={() => setShowForgotPasswordModal(false)}
+        />
+      )}
+      {showVerifyEmailModal && (
+        <VerifyCodeModal
+          email={getValues("email")}
+          isOpen={showVerifyEmailModal}
+          onClose={() => setShowVerifyEmailModal(false)}
         />
       )}
     </Box>
