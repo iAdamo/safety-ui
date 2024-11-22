@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +10,10 @@ import {
 } from "@/components/forms/schemas/FormSchema";
 import ForgotPasswordModal from "@/components/modals/ForgotPasswordModal";
 import { VerifyCodeModal } from "@/components/modals/VerifyEmailModal";
+import { AlertModal } from "@/components/modals/Alert/AlertModal";
+import { closeApp } from "@/utils/CloseApp";
+import { useAuth } from "@/context/authcontext";
+import getLocation from "@/hooks/GetLocation";
 import {
   VStack,
   HStack,
@@ -49,10 +53,36 @@ const Login = () => {
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const {
+    location,
+    locationError,
+    loading,
+    requestLocationPermission,
+    resetError,
+  } = getLocation();
+  const [showLocationError, setShowLocationError] = useState(false);
+
+  const { setAuthData } = useAuth();
 
   const router = useRouter();
   const toast = useToast();
 
+  // Show location error modal
+  useEffect(() => {
+    if (locationError) {
+      setShowLocationError(true);
+    }
+  }, [locationError]);
+
+  // Redirect to dashboard if user location is available
+  useEffect(() => {
+    // Trigger redirection if location is available
+    if (location) {
+      router.push("/dashboard/feeds");
+    }
+  }, [location]);
+
+  // handle form submission
   const {
     control,
     handleSubmit,
@@ -65,11 +95,13 @@ const Login = () => {
     ),
   });
 
+  // handle form validation
   const [validated, setValidated] = React.useState({
     emailValid: true,
     passwordValid: true,
   });
 
+  // handle form submission
   const onSubmit = async (data: FormSchemaType) => {
     try {
       const response = (await loginUser(data)) as LoginResponse;
@@ -79,10 +111,15 @@ const Login = () => {
           setShowVerifyEmailModal(true);
           return;
         }
+        setAuthData({
+          isAuthenticated: true,
+          userId: response.id,
+          userEmail: response.email,
+        });
         router.push("/dashboard/feeds");
         toast.show({
           placement: "top",
-          duration: 10000,
+          duration: 5000,
           render: ({ id }) => {
             return (
               <Toast nativeID={id} variant="outline" action="success">
@@ -99,7 +136,7 @@ const Login = () => {
       );
       toast.show({
         placement: "top",
-        duration: 10000,
+        duration: 5000,
         render: ({ id }) => {
           return (
             <Toast nativeID={id} variant="outline" action="error">
@@ -111,15 +148,17 @@ const Login = () => {
     }
   };
 
+  // handle password visibility
   const [showPassword, setShowPassword] = React.useState(false);
 
+  // handle password visibility
   const handleState = () => {
     setShowPassword((showState) => {
       return !showState;
     });
   };
 
-  //
+  // handle form submission on enter key press
   const handleKeyPress = () => {
     Keyboard.dismiss();
     handleSubmit(onSubmit)();
@@ -251,12 +290,15 @@ const Login = () => {
           Sanux Technologies
         </Text>
       </Center>
+
+      {/** Forgot password modal */}
       {showForgotPasswordModal && (
         <ForgotPasswordModal
           isOpen={showForgotPasswordModal}
           onClose={() => setShowForgotPasswordModal(false)}
         />
       )}
+      {/** Verify email modal */}
       {showVerifyEmailModal && (
         <VerifyCodeModal
           email={getValues("email")}
@@ -264,6 +306,22 @@ const Login = () => {
           onClose={() => setShowVerifyEmailModal(false)}
         />
       )}
+      {/** Location error modal */}
+      <AlertModal
+        open={showLocationError}
+        onClose={() => setShowLocationError(false)}
+        headerText="Location Disabled"
+        bodyText="Location services have been disabled. Please re-enable location services to continue using the app."
+        buttonOnePress={() => {
+          setShowLocationError(false);
+          resetError(); // Clear error before retrying
+          requestLocationPermission();
+        }}
+        buttonTwoPress={() => {
+          setShowLocationError(false);
+          closeApp();
+        }}
+      />
     </Box>
   );
 };

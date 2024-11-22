@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { getUnsafeZone } from "@/api/unsafeZoneHelper";
 import {
   Box,
   Center,

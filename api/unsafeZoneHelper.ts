@@ -50,13 +50,13 @@ export const updateUnsafeZone = async (id: string, data: UpdateUnsafeZone) => {
   }
 };
 
-interface FindUnsafeZone {
+interface GetUnsafeZone {
   userLat: number;
   userLong: number;
   proximityRange?: number;
 };
 
-export const findUnsafeZone = async (id: string, data: FindUnsafeZone) => {
+export const getUnsafeZone = async (id: string, data: GetUnsafeZone) => {
   try {
     const response = await unsafeAxios.get(`${id}/`, { params: data });
     return response.data;
