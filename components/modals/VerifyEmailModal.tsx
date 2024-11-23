@@ -5,7 +5,6 @@ import { sendCode, verifyEmail } from "@/api/authHelper";
 import { Toast, ToastTitle, useToast } from "@/components/ui";
 import { Keyboard } from "react-native";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/context/authcontext";
 
 interface VerifyCodeModalProps {
   isOpen: boolean;
@@ -17,8 +16,6 @@ const VerifyCodeModal: React.FC<VerifyCodeModalProps> = ({ isOpen, onClose, emai
   const [showModal, setShowModal] = useState(isOpen);
   const toast = useToast();
   const router = useRouter();
-
-  const { setAuthData } = useAuth();
 
   useEffect(() => {
     setShowModal(isOpen);
@@ -59,12 +56,6 @@ const VerifyCodeModal: React.FC<VerifyCodeModalProps> = ({ isOpen, onClose, emai
         code: data.code,
       });
       if (response) {
-        setAuthData((prev) => ({
-          ...prev,
-          userId: response.id,
-          active: true,
-          userEmail: response.email,
-        }));
         router.push("/dashboard/feeds");
         toast.show({
           placement: "top",

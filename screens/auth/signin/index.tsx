@@ -10,7 +10,8 @@ import {
 } from "@/components/forms/schemas/FormSchema";
 import ForgotPasswordModal from "@/components/modals/ForgotPasswordModal";
 import { VerifyCodeModal } from "@/components/modals/VerifyEmailModal";
-import { useAuth } from "@/context/authcontext";
+import { useDispatch, useSelector } from "react-redux";
+import { setAuthData } from "@/store/authSlice";
 import {
   VStack,
   HStack,
@@ -51,10 +52,17 @@ const Login = () => {
   const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { authData, setAuthData } = useAuth();
+  const dispatch = useDispatch();
+  const authData = useSelector((state: any) => state.auth);
 
   const router = useRouter();
   const toast = useToast();
+
+  useEffect(() => {
+    if (authData.isAuthenticated) {
+      router.push("/dashboard/feeds");
+    }
+  }, [authData.isAuthenticated]);
 
   // handle form submission
   const {
@@ -85,12 +93,14 @@ const Login = () => {
           setShowVerifyEmailModal(true);
           return;
         }
-        setAuthData({
-          isAuthenticated: true,
-          userId: response.id,
-          userEmail: response.email,
-          proximity: response.proximity,
-        });
+        dispatch(
+          setAuthData({
+            isAuthenticated: true,
+            userId: response.id,
+            userEmail: response.email,
+            proximity: response.proximity,
+          })
+        );
         router.push("/dashboard/feeds");
         toast.show({
           placement: "top",

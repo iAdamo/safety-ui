@@ -5,7 +5,7 @@ import { getUnsafeZone } from "@/api/unsafeZoneHelper";
 import getLocation from "@/hooks/GetLocation";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
-
+import { useSelector } from "react-redux";
 import {
   Box,
   Center,
@@ -53,6 +53,9 @@ const Feeds = () => {
   } = getLocation();
   const [showLocationError, setShowLocationError] = useState(false);
 
+
+  const authData = useSelector((state: any) => state.auth);
+
   const router = useRouter();
 
   // Show location error modal
@@ -66,7 +69,7 @@ const Feeds = () => {
   useEffect(() => {
     const fetchUnsafeZones = async () => {
       try {
-        const response = await getUnsafeZone(authData?.userId! || "", {
+        const response = await getUnsafeZone(authData.userId || "", {
           userLat: location?.latitude || 0,
           userLong: location?.longitude || 0,
           proximity: authData?.proximity || 0,
@@ -76,17 +79,14 @@ const Feeds = () => {
             setFeeds([{ id: 0, title: "No unsafe zones", body: "" }]);
           } else {
             setFeeds(response);
-            console.log(response);
           }
         }
       } catch (err) {
         setFeeds([(err as any).response.data.message]);
       }
     };
-    console.log(authData?.userId, location);
 
-    if (location) {
-      console.log(authData?.userId, location);
+    if (authData.userId && location) {
       fetchUnsafeZones();
       const intervalId = setInterval(fetchUnsafeZones, 300000); // Update every 5 minutes
 
@@ -94,7 +94,7 @@ const Feeds = () => {
     } else {
       requestLocationPermission();
     }
-  }, [authData?.userId, location]);
+  }, [authData.userId, location]);
 
   const handleCardPress = (id: number) => {
     setModalVisible((prev) => ({ ...prev, [id]: true }));
@@ -199,7 +199,7 @@ const Feeds = () => {
             trigger={(triggerProps) => (
               <Button
                 className="w-16 h-16 rounded-full bg-Khaki data-[hover=true]:bg-Khaki-600 data-[active=true]:bg-Khaki-700 shadow-hard-5"
-                onPress={() => router.push("/auth/edit")}
+                onPress={() => router.push("/auth/signup")}
                 {...triggerProps}
               >
                 <ButtonIcon as={SettingsIcon} />
