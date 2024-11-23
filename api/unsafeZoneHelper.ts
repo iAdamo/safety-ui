@@ -53,7 +53,7 @@ export const updateUnsafeZone = async (id: string, data: UpdateUnsafeZone) => {
 interface GetUnsafeZone {
   userLat: number;
   userLong: number;
-  proximityRange?: number;
+  proximity?: number;
 };
 
 export const getUnsafeZone = async (id: string, data: GetUnsafeZone) => {

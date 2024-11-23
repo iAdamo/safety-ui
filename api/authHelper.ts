@@ -51,11 +51,11 @@ export interface LoginResponse {
   id: string;
   email: string;
   verified: boolean;
+  proximity: number;
 }
 
 export const loginUser = async (data: AuthData) => {
   try {
-    console.log(data);
     const response = await authAxios.post("login/", data, {
       withCredentials: true,
     });

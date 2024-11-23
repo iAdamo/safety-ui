@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { getUnsafeZone } from "@/api/unsafeZoneHelper";
+import getLocation from "@/hooks/GetLocation";
+import { closeApp } from "@/utils/CloseApp";
+import { AlertModal } from "@/components/modals/Alert/AlertModal";
+
 import {
   Box,
   Center,
@@ -25,8 +29,12 @@ import {
   TooltipContent,
   TooltipText,
 } from "@/components/ui";
-import { ArrowLeftIcon, PlusIcon, MapPinIcon } from "lucide-react-native";
-import { EditIcon, TrashIcon } from "lucide-react-native";
+import {
+  ArrowLeftIcon,
+  PlusIcon,
+  MapPinIcon,
+  SettingsIcon,
+} from "lucide-react-native";
 
 const Feeds = () => {
   const [feeds, setFeeds] = useState<
@@ -35,15 +43,58 @@ const Feeds = () => {
   const [modalVisible, setModalVisible] = useState<{ [key: number]: boolean }>(
     {}
   );
+  const [unsafeZones, setUnsafeZones] = useState([]);
+  const {
+    location,
+    locationError,
+    loading,
+    requestLocationPermission,
+    resetError,
+  } = getLocation();
+  const [showLocationError, setShowLocationError] = useState(false);
+
   const router = useRouter();
 
+  // Show location error modal
   useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/posts")
-      .then((response) => response.json())
-      .then((json) => {
-        setFeeds(json);
-      });
-  }, []);
+    if (locationError) {
+      setShowLocationError(true);
+    }
+  }, [locationError]);
+
+  // Fetch unsafe zones
+  useEffect(() => {
+    const fetchUnsafeZones = async () => {
+      try {
+        const response = await getUnsafeZone(authData?.userId! || "", {
+          userLat: location?.latitude || 0,
+          userLong: location?.longitude || 0,
+          proximity: authData?.proximity || 0,
+        });
+        if (response) {
+          if (response.length === 0) {
+            setFeeds([{ id: 0, title: "No unsafe zones", body: "" }]);
+          } else {
+            setFeeds(response);
+            console.log(response);
+          }
+        }
+      } catch (err) {
+        setFeeds([(err as any).response.data.message]);
+      }
+    };
+    console.log(authData?.userId, location);
+
+    if (location) {
+      console.log(authData?.userId, location);
+      fetchUnsafeZones();
+      const intervalId = setInterval(fetchUnsafeZones, 300000); // Update every 5 minutes
+
+      return () => clearInterval(intervalId); // Clear interval on component unmount
+    } else {
+      requestLocationPermission();
+    }
+  }, [authData?.userId, location]);
 
   const handleCardPress = (id: number) => {
     setModalVisible((prev) => ({ ...prev, [id]: true }));
@@ -139,7 +190,7 @@ const Feeds = () => {
           >
             <TooltipContent className="bg-background-50 rounded-md">
               <Box className="p-2.5">
-                <Text size="sm">Add</Text>
+                <Text size="sm">Profile</Text>
               </Box>
             </TooltipContent>
           </Tooltip>
@@ -151,13 +202,13 @@ const Feeds = () => {
                 onPress={() => router.push("/auth/edit")}
                 {...triggerProps}
               >
-                <ButtonIcon as={EditIcon} />
+                <ButtonIcon as={SettingsIcon} />
               </Button>
             )}
           >
             <TooltipContent className="bg-background-50 rounded-md">
               <Box className="p-2.5">
-                <Text size="sm">Edit</Text>
+                <Text size="sm">Settings</Text>
               </Box>
             </TooltipContent>
           </Tooltip>
@@ -172,7 +223,8 @@ const Feeds = () => {
                 >
                   <ButtonIcon as={MapPinIcon} />
                 </Button>
-              );}}
+              );
+            }}
           >
             <TooltipContent className="bg-background-50 rounded-md">
               <Box className="p-2.5">
@@ -182,6 +234,22 @@ const Feeds = () => {
           </Tooltip>
         </VStack>
       </Box>
+      {/** Location error modal */}
+      <AlertModal
+        open={showLocationError}
+        onClose={() => setShowLocationError(false)}
+        headerText="Location Disabled"
+        bodyText="Location services have been disabled. Please re-enable location services to continue using the app."
+        buttonOnePress={() => {
+          setShowLocationError(false);
+          resetError(); // Clear error before retrying
+          requestLocationPermission();
+        }}
+        buttonTwoPress={() => {
+          setShowLocationError(false);
+          closeApp();
+        }}
+      />
     </Box>
   );
 };
