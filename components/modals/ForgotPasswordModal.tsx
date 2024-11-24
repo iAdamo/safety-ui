@@ -100,6 +100,20 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
   const handlePasswordReset = async (data: FormSchemaType) => {
     try {
+      if (data.password !== data.confirmPassword) {
+        toast.show({
+          placement: "top",
+          duration: 3000,
+          render: ({ id }) => {
+            return (
+              <Toast nativeID={id} variant="outline" action="error">
+                <ToastTitle>Passwords do not match</ToastTitle>
+              </Toast>
+            );
+          },
+        });
+        return;
+      }
       const response = await resetPassword({
         email: email!, // Use the stored email
         password: data.password,
@@ -168,12 +182,14 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
         title="Reset password"
         description="A verification code has been sent to you. Enter code below."
         extraText="Didn't receive the code?"
-        onSubmit_2={() => handleSendCode({
-          email: email!,
-          code: "",
-          password: "",
-          confirmPassword: ""
-        })} // Use the stored email
+        onSubmit_2={() =>
+          handleSendCode({
+            email: email!,
+            code: "",
+            password: "",
+            confirmPassword: "",
+          })
+        } // Use the stored email
         fields={[
           {
             name: "code",

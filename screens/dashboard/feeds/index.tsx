@@ -60,6 +60,7 @@ const Feeds = () => {
   useEffect(() => {
     const fetchUnsafeZones = async () => {
       try {
+        console.log("Hey its 5 mins");
         const response = await getUnsafeZone(authData.userId || "", {
           userLat: location?.latitude || 0,
           userLong: location?.longitude || 0,
@@ -67,7 +68,13 @@ const Feeds = () => {
         });
         if (response) {
           if (response.length === 0) {
-            setFeeds([{ id: 0, title: `Your proximity - ${authData.proximity} meters is looking safe`, body: "" }]);
+            setFeeds([
+              {
+                id: 0,
+                title: `Your proximity - ${authData.proximity} meters is looking safe`,
+                body: "",
+              },
+            ]);
           } else {
             setFeeds(response);
           }

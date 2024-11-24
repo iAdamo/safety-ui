@@ -32,32 +32,13 @@ const OptionMenu = () => {
   return (
     <Box className="absolute bottom-20 right-5">
       <VStack space="md">
-        <Tooltip
-          placement="left"
-          trigger={(triggerProps) => (
-            <Button
-              className="w-16 h-16 rounded-full bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700 shadow-hard-5"
-              onPress={() => router.push("/auth/signup")}
-              {...triggerProps}
-            >
-              <ButtonIcon as={PlusIcon} />
-            </Button>
-          )}
-        >
-          <TooltipContent className="bg-background-50 rounded-md">
-            <Box className="p-2.5">
-              <Text size="sm">Settings</Text>
-            </Box>
-          </TooltipContent>
-        </Tooltip>
-
         <Menu
           offset={5}
           placement="bottom left"
           trigger={({ ...triggerProps }) => {
             return (
               <Button
-                className="w-16 h-16 rounded-full bg-Khaki data-[hover=true]:bg-Khaki-600 data-[active=true]:bg-Khaki-700"
+                className="w-16 h-16 rounded-full bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
                 {...triggerProps}
               >
                 <ButtonIcon as={SettingsIcon} />
@@ -108,6 +89,25 @@ const OptionMenu = () => {
             <MenuItemLabel size="sm">Logout</MenuItemLabel>
           </MenuItem>
         </Menu>
+
+        <Tooltip
+          placement="left"
+          trigger={(triggerProps) => (
+            <Button
+              className="w-16 h-16 rounded-full bg-Khaki data-[hover=true]:bg-Khaki-600 data-[active=true]:bg-Khaki-700 shadow-hard-5"
+              onPress={() => router.push("/auth/signup")}
+              {...triggerProps}
+            >
+              <ButtonIcon as={PlusIcon} />
+            </Button>
+          )}
+        >
+          <TooltipContent className="bg-background-50 rounded-md">
+            <Box className="p-2.5">
+              <Text size="sm">Settings</Text>
+            </Box>
+          </TooltipContent>
+        </Tooltip>
 
         <Tooltip
           placement="left"
