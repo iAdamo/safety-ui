@@ -24,14 +24,9 @@ const authSlice = createSlice({
       state.userEmail = action.payload.userEmail;
       state.proximity = action.payload.proximity;
     },
-    clearAuthData: (state) => {
-      state.isAuthenticated = false;
-      state.userId = null;
-      state.userEmail = null;
-      state.proximity = null;
-    },
+    logout: () => initialState,
   },
 });
 
-export const { setAuthData, clearAuthData } = authSlice.actions;
+export const { setAuthData, logout } = authSlice.actions;
 export default authSlice.reducer;

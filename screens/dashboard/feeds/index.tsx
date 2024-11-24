@@ -5,7 +5,9 @@ import { getUnsafeZone } from "@/api/unsafeZoneHelper";
 import getLocation from "@/hooks/GetLocation";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
+import { FeedCardModal } from "@/components/modals/FeedCardModal";
 import { useSelector } from "react-redux";
+import { OptionMenu } from "@/components/menu/OptionsMenu";
 import {
   Box,
   Center,
@@ -18,16 +20,6 @@ import {
   Button,
   ButtonIcon,
   ButtonText,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
-  TooltipContent,
-  TooltipText,
 } from "@/components/ui";
 import {
   ArrowLeftIcon,
@@ -53,7 +45,6 @@ const Feeds = () => {
   } = getLocation();
   const [showLocationError, setShowLocationError] = useState(false);
 
-
   const authData = useSelector((state: any) => state.auth);
 
   const router = useRouter();
@@ -76,13 +67,13 @@ const Feeds = () => {
         });
         if (response) {
           if (response.length === 0) {
-            setFeeds([{ id: 0, title: "No unsafe zones", body: "" }]);
+            setFeeds([{ id: 0, title: `Your proximity - ${authData.proximity} meters is looking safe`, body: "" }]);
           } else {
             setFeeds(response);
           }
         }
       } catch (err) {
-        setFeeds([(err as any).response.data.message]);
+        console.error(err);
       }
     };
 
@@ -127,113 +118,20 @@ const Feeds = () => {
                   </Heading>
                   <Text size="sm">{feed.body}</Text>
                 </Card>
-                <Modal
-                  isOpen={modalVisible[feed.id] || false}
+                <FeedCardModal
+                  isOpen={modalVisible[feed.id]}
                   onClose={() => handleCloseModal(feed.id)}
-                  isKeyboardDismissable={true}
-                  closeOnOverlayClick={true}
-                  avoidKeyboard={true}
-                >
-                  <ModalBackdrop />
-                  <ModalContent>
-                    <ModalHeader className="flex-col items-start gap-0.5">
-                      <Heading>{feed.title}</Heading>
-                      <Text>{feed.body}</Text>
-                      <ModalCloseButton
-                        onPress={() => handleCloseModal(feed.id)}
-                      />
-                    </ModalHeader>
-                    <ModalBody className="mb-4">
-                      <Text>Additional content for {feed.title}</Text>
-                    </ModalBody>
-                    <ModalFooter className="flex-col items-start">
-                      <Button
-                        variant="solid"
-                        className="w-full bg-SteelBlue data-[hover=true]:bg-SteelBlue-600 data-[active=true]:bg-SteelBlue-700"
-                        onPress={() => handleCloseModal(feed.id)}
-                      >
-                        <ButtonText>Close</ButtonText>
-                      </Button>
-                      <HStack space="xs" className="items-center">
-                        <Button
-                          className="gap-1"
-                          variant="link"
-                          size="sm"
-                          onPress={() => handleCloseModal(feed.id)}
-                        >
-                          <ButtonIcon as={ArrowLeftIcon} />
-                          <ButtonText>Back</ButtonText>
-                        </Button>
-                      </HStack>
-                    </ModalFooter>
-                  </ModalContent>
-                </Modal>
+                  feed={feed}
+                />
               </TouchableOpacity>
             ))}
           </ScrollView>
         </VStack>
       </VStack>
       <VStack className="h-16 bg-SteelBlue border-0 shadow-hard-5-steelblue absolute bottom-0 w-full"></VStack>
-      <Box className="absolute bottom-20 right-5">
-        <VStack space="md">
-          <Tooltip
-            placement="left"
-            trigger={(triggerProps) => (
-              <Button
-                className="w-16 h-16 rounded-full bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
-                onPress={() => router.push("/auth/signup")}
-                {...triggerProps}
-              >
-                <ButtonIcon as={PlusIcon} />
-              </Button>
-            )}
-          >
-            <TooltipContent className="bg-background-50 rounded-md">
-              <Box className="p-2.5">
-                <Text size="sm">Profile</Text>
-              </Box>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip
-            placement="left"
-            trigger={(triggerProps) => (
-              <Button
-                className="w-16 h-16 rounded-full bg-Khaki data-[hover=true]:bg-Khaki-600 data-[active=true]:bg-Khaki-700 shadow-hard-5"
-                onPress={() => router.push("/auth/signup")}
-                {...triggerProps}
-              >
-                <ButtonIcon as={SettingsIcon} />
-              </Button>
-            )}
-          >
-            <TooltipContent className="bg-background-50 rounded-md">
-              <Box className="p-2.5">
-                <Text size="sm">Settings</Text>
-              </Box>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip
-            placement="left"
-            trigger={(triggerProps) => {
-              return (
-                <Button
-                  className="w-16 h-16 rounded-full bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
-                  {...triggerProps}
-                  onPress={() => router.push("/dashboard/map")}
-                >
-                  <ButtonIcon as={MapPinIcon} />
-                </Button>
-              );
-            }}
-          >
-            <TooltipContent className="bg-background-50 rounded-md">
-              <Box className="p-2.5">
-                <Text size="sm">Mark Unsafe Zone</Text>
-              </Box>
-            </TooltipContent>
-          </Tooltip>
-        </VStack>
-      </Box>
+
+      <OptionMenu />
+
       {/** Location error modal */}
       <AlertModal
         open={showLocationError}

@@ -19,3 +19,5 @@ export * from "./utils/use-media-query";
 export * from "./card";
 export * from "./tooltip";
 export * from "./alert-dialog";
+export * from "./menu";
+export * from "./badge";
