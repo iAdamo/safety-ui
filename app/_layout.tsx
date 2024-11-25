@@ -14,7 +14,6 @@ export default function RootLayout() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <GluestackUIProvider>
-          <StatusBar barStyle="dark-content" translucent={true} />
           <AuthChecker>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="auth/signin" />
@@ -37,8 +36,11 @@ function AuthChecker({ children }: { children: React.ReactNode }) {
     // Only attempt redirection if the router is fully mounted
     if (!authData.isAuthenticated) {
       router.replace("/auth/signin");
+    } else if (authData.isAuthenticated) {
+      router.replace("/dashboard/feeds");
     }
   }, [authData.isAuthenticated, router]);
+
 
   return <Slot />; // Ensure the Slot component is rendered
 }

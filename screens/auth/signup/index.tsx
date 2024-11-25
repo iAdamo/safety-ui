@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { StatusBar } from "react-native";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -72,8 +73,8 @@ const SignUp = () => {
   const onSubmit = async (data: FormSchemaType) => {
     if (data.password !== data.confirmPassword) {
       toast.show({
-        placement: "top",
-        duration: 10000,
+        placement: "bottom left",
+        duration: 5000,
         render: ({ id }) => {
           return (
             <Toast nativeID={id} variant="outline" action="error">
@@ -91,7 +92,7 @@ const SignUp = () => {
         if (response) {
           await sendCode({ email: data.email });
           toast.show({
-            placement: "top",
+            placement: "bottom left",
             duration: 3000,
             render: ({ id }) => {
               return (
@@ -105,7 +106,7 @@ const SignUp = () => {
         }
       } catch (error) {
         toast.show({
-          placement: "top",
+          placement: "bottom left",
           duration: 3000,
           render: ({ id }) => {
             return (
@@ -146,6 +147,11 @@ const SignUp = () => {
       {!isMobile && (
         <Box className="hidden md:flex md:flex-col md:w-1/4 md:h-full md:bg-Teal md:fixed md:left-0"></Box>
       )}
+      <StatusBar
+        barStyle="dark-content"
+        translucent={true}
+        backgroundColor={"#008080"}
+      />
       <VStack
         className={`flex-1 max-w-full flex-col justify-center ${
           isMobile ? "pt-10" : "pt-20 md:ml-1/4"
@@ -173,9 +179,9 @@ const SignUp = () => {
                   },
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <Input className="h-12 focus-within:bg-blue-100 focus-within:border-blue-500">
+                  <Input className="h-12 ">
                     <InputField
-                      className="text-sm focus:bg-blue-100 focus:border-blue-500"
+                      className="text-sm "
                       type="text"
                       placeholder="Email"
                       onChangeText={onChange}
@@ -216,9 +222,9 @@ const SignUp = () => {
                   },
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <Input className="h-12 focus-within:bg-blue-100 focus-within:border-blue-500">
+                  <Input className="h-12">
                     <InputField
-                      className="text-sm focus:bg-blue-100 focus:border-blue-500"
+                      className="text-sm"
                       placeholder="Password"
                       value={value}
                       onChangeText={onChange}
@@ -262,9 +268,9 @@ const SignUp = () => {
                   },
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <Input className="h-12 focus-within:bg-blue-100 focus-within:border-blue-500">
+                  <Input className="h-12">
                     <InputField
-                      className="text-sm focus:bg-blue-100 focus:border-blue-500"
+                      className="text-sm"
                       placeholder="Confirm Password"
                       value={value}
                       onChangeText={onChange}

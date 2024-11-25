@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { StatusBar } from "react-native";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -103,7 +104,7 @@ const Login = () => {
         );
         router.push("/dashboard/feeds");
         toast.show({
-          placement: "top",
+          placement: "bottom left",
           duration: 5000,
           render: ({ id }) => {
             return (
@@ -120,7 +121,7 @@ const Login = () => {
         (error as any).response?.data?.message || "An unexpected error occurred"
       );
       toast.show({
-        placement: "top",
+        placement: "bottom left",
         duration: 5000,
         render: ({ id }) => {
           return (
@@ -151,6 +152,12 @@ const Login = () => {
 
   return (
     <Box className="flex-1">
+      <StatusBar
+        barStyle="dark-content"
+        translucent={true}
+        backgroundColor={"#CD5C5C"}
+      />
+
       <SafeAreaView className="h-[160px] bg-IndianRed border-0 shadow-hard-5-indianred"></SafeAreaView>
       <VStack className="flex max-w-full pt-14 flex-col items-center">
         <VStack className="flex border-1 shadow-hard-5 p-5 mx-5 mb-5 flex-col items-center gap-6">
@@ -175,15 +182,15 @@ const Login = () => {
               render={({
                 field: { onChange, onBlur, value },
               }: ControllerRenderType) => (
-                <Input className="h-12 focus-within:bg-blue-100 focus-within:border-blue-500">
+                <Input className="h-12">
                   <InputField
-                    placeholder="email"
+                    placeholder="Email"
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
                     onSubmitEditing={handleKeyPress}
                     returnKeyType="done"
-                    className="focus:bg-blue-100 focus:border-blue-500"
+                    className=""
                   />
                 </Input>
               )}
@@ -218,7 +225,7 @@ const Login = () => {
               render={({
                 field: { onChange, onBlur, value },
               }: ControllerRenderType) => (
-                <Input className="h-12 focus-within:bg-blue-100 focus-within:border-blue-500">
+                <Input className="h-12 ">
                   <InputField
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter password"
@@ -227,7 +234,7 @@ const Login = () => {
                     onBlur={onBlur}
                     onSubmitEditing={handleKeyPress}
                     returnKeyType="done"
-                    className="focus:bg-blue-100 focus:border-blue-500"
+                    className=""
                   />
                   <InputSlot onPress={handleState} className="pr-3">
                     <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />

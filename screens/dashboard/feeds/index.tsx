@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { StatusBar } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { getUnsafeZone } from "@/api/unsafeZoneHelper";
@@ -89,9 +90,10 @@ const Feeds = () => {
       const intervalId = setInterval(fetchUnsafeZones, 300000); // Update every 5 minutes
 
       return () => clearInterval(intervalId); // Clear interval on component unmount
-    } else {
-      requestLocationPermission();
     }
+    //else {
+      //requestLocationPermission();
+    //}
   }, [authData.userId, location]);
 
   const handleCardPress = (id: number) => {
@@ -104,6 +106,11 @@ const Feeds = () => {
 
   return (
     <Box className="flex-1">
+      <StatusBar
+        barStyle="dark-content"
+        translucent={true}
+        backgroundColor={"#4682B4"}
+      />
       <SafeAreaView className="h-40 bg-SteelBlue border-0 shadow-hard-5-indianred"></SafeAreaView>
       <VStack className="flex-1 p-5">
         <VStack className="h-full p-3">

@@ -91,25 +91,14 @@ export const FormModal: React.FC<FormModalProps> = ({
         <ModalBody className="mb-4">
           {fields.map(({ name, label, placeholder, type }) => (
             <FormControl isInvalid={!!errors[name]} key={name}>
-              <FormControlLabel>
-                <FormControlLabelText>{label}</FormControlLabelText>
-              </FormControlLabel>
+              
               <Controller
                 defaultValue=""
                 control={control}
                 name={name}
-                rules={{
-                  validate: async (value) => {
-                    try {
-                      await schema.parseAsync({ [name]: value });
-                      return true;
-                    } catch (error: any) {
-                      return error.message;
-                    }
-                  },
-                }}
+
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <Input>
+                  <Input className="h-12">
                     <InputField
                       placeholder={placeholder}
                       type={type}
