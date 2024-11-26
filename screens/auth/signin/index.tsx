@@ -3,7 +3,6 @@ import { StatusBar } from "react-native";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginUser, LoginResponse } from "@/api/authHelper";
 import { AlertTriangle } from "lucide-react-native";
 import {
   formSchema,
@@ -11,8 +10,7 @@ import {
 } from "@/components/forms/schemas/FormSchema";
 import ForgotPasswordModal from "@/components/modals/ForgotPasswordModal";
 import { VerifyCodeModal } from "@/components/modals/VerifyEmailModal";
-import { useDispatch, useSelector } from "react-redux";
-import { setAuthData } from "@/store/authSlice";
+import { useSession } from "@/context/AuthContext";
 import {
   VStack,
   HStack,
@@ -53,17 +51,10 @@ const Login = () => {
   const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const dispatch = useDispatch();
-  const authData = useSelector((state: any) => state.auth);
+  const { login, loading } = useSession();
 
   const router = useRouter();
   const toast = useToast();
-
-  useEffect(() => {
-    if (authData.isAuthenticated) {
-      router.push("/dashboard/feeds");
-    }
-  }, [authData.isAuthenticated]);
 
   // handle form submission
   const {
@@ -87,34 +78,8 @@ const Login = () => {
   // handle form submission
   const onSubmit = async (data: FormSchemaType) => {
     try {
-      const response = (await loginUser(data)) as LoginResponse;
-      if (response) {
-        setValidated({ emailValid: true, passwordValid: true });
-        if (!response.verified) {
-          setShowVerifyEmailModal(true);
-          return;
-        }
-        dispatch(
-          setAuthData({
-            isAuthenticated: true,
-            userId: response.id,
-            userEmail: response.email,
-            proximity: response.proximity,
-          })
-        );
-        router.push("/dashboard/feeds");
-        toast.show({
-          placement: "bottom left",
-          duration: 5000,
-          render: ({ id }) => {
-            return (
-              <Toast nativeID={id} variant="outline" action="success">
-                <ToastTitle>"Login successful"</ToastTitle>
-              </Toast>
-            );
-          },
-        });
-      }
+      await login(data);
+      router.replace("/dashboard/feeds");
     } catch (error) {
       setValidated({ emailValid: false, passwordValid: false });
       setErrorMessage(
@@ -255,7 +220,9 @@ const Login = () => {
               className="w-full h-12 bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
               onPress={handleSubmit(onSubmit)}
             >
-              <ButtonText className="font-medium">Log In</ButtonText>
+              <ButtonText className="font-medium">
+                {loading ? "Loading..." : "Log In"}
+              </ButtonText>
             </Button>
           </VStack>
           <HStack>

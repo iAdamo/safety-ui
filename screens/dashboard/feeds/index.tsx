@@ -7,27 +7,16 @@ import getLocation from "@/hooks/GetLocation";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
 import { FeedCardModal } from "@/components/modals/FeedCardModal";
-import { useSelector } from "react-redux";
 import { OptionMenu } from "@/components/menu/OptionsMenu";
+import { useSession } from "@/context/AuthContext";
 import {
   Box,
-  Center,
   Text,
   VStack,
-  HStack,
   SafeAreaView,
   Card,
   Heading,
-  Button,
-  ButtonIcon,
-  ButtonText,
 } from "@/components/ui";
-import {
-  ArrowLeftIcon,
-  PlusIcon,
-  MapPinIcon,
-  SettingsIcon,
-} from "lucide-react-native";
 
 const Feeds = () => {
   const [feeds, setFeeds] = useState<
@@ -36,6 +25,9 @@ const Feeds = () => {
   const [modalVisible, setModalVisible] = useState<{ [key: number]: boolean }>(
     {}
   );
+
+  const { userData } = useSession();
+
   const [unsafeZones, setUnsafeZones] = useState([]);
   const {
     location,
@@ -45,8 +37,6 @@ const Feeds = () => {
     resetError,
   } = getLocation();
   const [showLocationError, setShowLocationError] = useState(false);
-
-  const authData = useSelector((state: any) => state.auth);
 
   const router = useRouter();
 
@@ -61,18 +51,17 @@ const Feeds = () => {
   useEffect(() => {
     const fetchUnsafeZones = async () => {
       try {
-        console.log("Hey its 5 mins");
-        const response = await getUnsafeZone(authData.userId || "", {
+        const response = await getUnsafeZone(userData.id || "", {
           userLat: location?.latitude || 0,
           userLong: location?.longitude || 0,
-          proximity: authData?.proximity || 0,
+          proximity: userData.proximity || 0,
         });
         if (response) {
           if (response.length === 0) {
             setFeeds([
               {
                 id: 0,
-                title: `Your proximity - ${authData.proximity} meters is looking safe`,
+                title: `Your proximity - ${userData.proximity} meters is looking safe`,
                 body: "",
               },
             ]);
@@ -85,16 +74,15 @@ const Feeds = () => {
       }
     };
 
-    if (authData.userId && location) {
+    if (userData.id && location) {
       fetchUnsafeZones();
       const intervalId = setInterval(fetchUnsafeZones, 300000); // Update every 5 minutes
 
       return () => clearInterval(intervalId); // Clear interval on component unmount
+    } else {
+      requestLocationPermission();
     }
-    //else {
-      //requestLocationPermission();
-    //}
-  }, [authData.userId, location]);
+  }, [userData.id, location]);
 
   const handleCardPress = (id: number) => {
     setModalVisible((prev) => ({ ...prev, [id]: true }));
