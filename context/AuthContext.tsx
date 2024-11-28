@@ -36,7 +36,6 @@ export function SessionProvider({ children }: PropsWithChildren<{}>) {
           try {
             const response = await loginUser(credentials);
             if (response) {
-              console.log("Logged in:", response);
               setSession(response.id);
               setUserData(response);
             }

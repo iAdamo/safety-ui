@@ -16,6 +16,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#CD5C5C"
       },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDww4znglj6sdK38cXZIY5wWkr6j3jF9b4"
+        }
+      },
       "package": "com.sanuxtech.safetyui"
     },
     "web": {

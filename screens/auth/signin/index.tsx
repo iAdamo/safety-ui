@@ -9,7 +9,6 @@ import {
   FormSchemaType,
 } from "@/components/forms/schemas/FormSchema";
 import ForgotPasswordModal from "@/components/modals/ForgotPasswordModal";
-import { VerifyCodeModal } from "@/components/modals/VerifyEmailModal";
 import { useSession } from "@/context/AuthContext";
 import {
   VStack,
@@ -48,10 +47,9 @@ type ControllerRenderType = {
 
 const Login = () => {
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
-  const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const { login, loading } = useSession();
+  const { login } = useSession();
+  const [ isLoading, setIsLoading ] = useState(false);
 
   const router = useRouter();
   const toast = useToast();
@@ -77,9 +75,10 @@ const Login = () => {
 
   // handle form submission
   const onSubmit = async (data: FormSchemaType) => {
+    setIsLoading(true);
     try {
       await login(data);
-      router.replace("/dashboard/feeds");
+      setIsLoading(false);
     } catch (error) {
       setValidated({ emailValid: false, passwordValid: false });
       setErrorMessage(
@@ -221,7 +220,7 @@ const Login = () => {
               onPress={handleSubmit(onSubmit)}
             >
               <ButtonText className="font-medium">
-                {loading ? "Loading..." : "Log In"}
+                {isLoading ? "Loading..." : "Log In"}
               </ButtonText>
             </Button>
           </VStack>
@@ -255,14 +254,6 @@ const Login = () => {
         <ForgotPasswordModal
           isOpen={showForgotPasswordModal}
           onClose={() => setShowForgotPasswordModal(false)}
-        />
-      )}
-      {/** Verify email modal */}
-      {showVerifyEmailModal && (
-        <VerifyCodeModal
-          email={getValues("email")}
-          isOpen={showVerifyEmailModal}
-          onClose={() => setShowVerifyEmailModal(false)}
         />
       )}
     </Box>

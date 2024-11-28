@@ -113,7 +113,7 @@ const Feeds = () => {
               >
                 <Card
                   variant="elevated"
-                  className="mx-10 mb-3 shadow-hard-5 bg-primary"
+                  className="mb-3 shadow-SteelBlue shadow-sm bg-primary"
                 >
                   <Heading size="md" className="mb-1">
                     {feed.title}

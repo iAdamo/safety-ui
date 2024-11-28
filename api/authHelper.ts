@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const authAxios = axios.create({
-  baseURL: "http://127.0.0.1:3000/api/auth",
+  baseURL: "https://r1w17jd5-3000.uks1.devtunnels.ms/api/auth",
   withCredentials: true,
 });
 
