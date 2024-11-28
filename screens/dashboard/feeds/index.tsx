@@ -96,7 +96,6 @@ const Feeds = () => {
     <Box className="flex-1">
       <StatusBar
         barStyle="dark-content"
-        translucent={true}
         backgroundColor={"#4682B4"}
       />
       <SafeAreaView className="h-40 bg-SteelBlue border-0 shadow-hard-5-indianred"></SafeAreaView>
