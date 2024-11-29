@@ -21,3 +21,5 @@ export * from "./tooltip";
 export * from "./alert-dialog";
 export * from "./menu";
 export * from "./badge";
+export * from "./textarea";
+export * from "./radio";

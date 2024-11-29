@@ -5,22 +5,7 @@ const unsafeAxios = axios.create({
   withCredentials: true,
 });
 
-interface CreateUnsafeZone {
-  markedBy: string;
-  location: {
-    type: string;
-    coordinates: [number, number];
-  };
-  radius?: number;
-  severityLevel: "low" | "medium" | "high";
-  description?: string;
-  audio?: string;
-  video?: string;
-  resolved?: boolean;
-  active?: boolean;
-}
-
-export const createUnsafeZone = async (data: CreateUnsafeZone) => {
+export const createUnsafeZone = async (data: any) => {
   try {
     const response = await unsafeAxios.post("create/", data);
     return response.data;
