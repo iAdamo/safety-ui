@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { StatusBar } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { getUnsafeZone } from "@/api/unsafeZoneHelper";
-import getLocation from "@/hooks/GetLocation";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
 import { FeedCardModal } from "@/components/modals/FeedCardModal";
 import { OptionMenu } from "@/components/menu/OptionsMenu";
 import { useSession } from "@/context/AuthContext";
+import { useUnsafeZones } from "@/hooks/useUnsafeZones";
+import useLocation from "@/hooks/GetLocation";
 import {
   Box,
   Text,
@@ -18,24 +18,13 @@ import {
   Heading,
 } from "@/components/ui";
 
-import { IUnsafeZoneResponse } from "@/components/componentTypes";
-
 const Feeds = () => {
-  const [feeds, setFeeds] = useState<IUnsafeZoneResponse[]>([]);
   const [modalVisible, setModalVisible] = useState<{ [key: string]: boolean }>(
     {}
   );
-
-  const { userData } = useSession();
-
-  const [unsafeZones, setUnsafeZones] = useState([]);
-  const {
-    location,
-    locationError,
-    loading,
-    requestLocationPermission,
-    resetError,
-  } = getLocation();
+  const { unsafeZones, loading, fetchUnsafeZones } = useUnsafeZones();
+  const { locationError, requestLocationPermission, resetError } =
+    useLocation();
   const [showLocationError, setShowLocationError] = useState(false);
 
   const router = useRouter();
@@ -46,37 +35,6 @@ const Feeds = () => {
       setShowLocationError(true);
     }
   }, [locationError]);
-
-  // Fetch unsafe zones
-  useEffect(() => {
-    const fetchUnsafeZones = async () => {
-      try {
-        const response = await getUnsafeZone(userData.id || "", {
-          userLat: location?.latitude || 0,
-          userLong: location?.longitude || 0,
-          proximity: userData.proximity || 0,
-        });
-        if (response) {
-          if (response.length === 0) {
-            setFeeds([]);
-          } else {
-            setFeeds(response);
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    if (userData.id && location) {
-      fetchUnsafeZones();
-      const intervalId = setInterval(fetchUnsafeZones, 300000); // Update every 5 minutes
-
-      return () => clearInterval(intervalId); // Clear interval on component unmount
-    } else {
-      requestLocationPermission();
-    }
-  }, [userData.id, location]);
 
   const handleCardPress = (_id: string) => {
     setModalVisible((prev) => ({ ...prev, [_id]: true }));
@@ -96,27 +54,28 @@ const Feeds = () => {
             className="flex-col h-full pt-3"
             showsVerticalScrollIndicator={false}
           >
-            {feeds.map((feed) => (
-              <TouchableOpacity
-                key={feed._id}
-                onPress={() => handleCardPress(feed._id)}
-              >
-                <Card
-                  variant="elevated"
-                  className="mb-3 shadow-SteelBlue shadow-sm bg-primary"
+            {unsafeZones &&
+              unsafeZones.map((feed) => (
+                <TouchableOpacity
+                  key={feed._id}
+                  onPress={() => handleCardPress(feed._id)}
                 >
-                  <Heading size="md" className="mb-1">
-                    {feed.title}
-                  </Heading>
-                  <Text size="sm">{feed.description}</Text>
-                </Card>
-                <FeedCardModal
-                  isOpen={modalVisible[feed._id]}
-                  onClose={() => handleCloseModal(feed._id)}
-                  feed={feed}
-                />
-              </TouchableOpacity>
-            ))}
+                  <Card
+                    variant="elevated"
+                    className="mb-3 shadow-SteelBlue shadow-sm bg-primary"
+                  >
+                    <Heading size="md" className="mb-1">
+                      {feed.title}
+                    </Heading>
+                    <Text size="sm">{feed.description}</Text>
+                  </Card>
+                  <FeedCardModal
+                    isOpen={modalVisible[feed._id]}
+                    onClose={() => handleCloseModal(feed._id)}
+                    feed={feed}
+                  />
+                </TouchableOpacity>
+              ))}
           </ScrollView>
         </VStack>
       </VStack>
