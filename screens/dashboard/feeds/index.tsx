@@ -4,11 +4,10 @@ import { ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
-import { FeedCardModal } from "@/components/modals/FeedCardModal";
 import { OptionMenu } from "@/components/menu/OptionsMenu";
-import { useSession } from "@/context/AuthContext";
 import { useUnsafeZones } from "@/hooks/useUnsafeZones";
 import useLocation from "@/hooks/GetLocation";
+import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
 import {
   Box,
   Text,
@@ -69,10 +68,10 @@ const Feeds = () => {
                     </Heading>
                     <Text size="sm">{feed.description}</Text>
                   </Card>
-                  <FeedCardModal
+                  <ViewUnsafeModal
                     isOpen={modalVisible[feed._id]}
                     onClose={() => handleCloseModal(feed._id)}
-                    feed={feed}
+                    zone={feed}
                   />
                 </TouchableOpacity>
               ))}

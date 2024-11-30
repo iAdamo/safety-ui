@@ -43,17 +43,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   UnsafeZoneSchema,
   UnsafeZoneSchemaType,
-} from "../forms/schemas/UnsafeZoneSchema";
+} from "../../forms/schemas/UnsafeZoneSchema";
 import { AlertTriangle, CircleIcon } from "lucide-react-native";
 
-interface UnsafeZoneModalProps {
+interface CreateUnsafeZoneModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: UnsafeZoneSchemaType) => void;
   zone?: any;
 }
 
-export const UnsafeZoneModal: React.FC<UnsafeZoneModalProps> = ({
+export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
   isOpen,
   onClose,
   onSubmit,

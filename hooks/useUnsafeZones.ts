@@ -9,7 +9,8 @@ import useLocation from "@/hooks/GetLocation";
 export function useUnsafeZones() {
   const { userData } = useSession();
   const { location } = useLocation();
-  const [[loading, unsafeZones], setUnsafeZones] = useStorageState<IUnsafeZoneResponse[]>("unsafeZones");
+  const [[loading, unsafeZones], setUnsafeZones] =
+    useStorageState<IUnsafeZoneResponse[]>("unsafeZones");
 
   const fetchUnsafeZones = useCallback(async () => {
     if (userData.id && location) {

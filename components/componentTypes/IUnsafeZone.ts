@@ -25,7 +25,8 @@ export interface IUnsafeZoneResponse {
   location: {
     coordinates: [number, number];
   };
-  created_at: Date;
+  createdAt: Date;
+  updatedt: Date;
   image?: string;
   audio?: string;
   video?: string;

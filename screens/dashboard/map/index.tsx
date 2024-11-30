@@ -4,7 +4,8 @@ import useLocation from "@/hooks/GetLocation";
 import { useSession } from "@/context/AuthContext";
 import { Box, VStack, Text, Button, ButtonText } from "@/components/ui";
 import { StyleSheet } from "react-native";
-import { UnsafeZoneModal } from "@/components/modals/UnsafeZoneModal";
+import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
+import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
 import { createUnsafeZone } from "@/api/unsafeZoneHelper";
 import { UnsafeZoneSchemaType } from "@/components/forms/schemas/UnsafeZoneSchema";
 import { closeApp } from "@/utils/CloseApp";
@@ -29,12 +30,11 @@ const MapScreen = () => {
   const { unsafeZones, fetchUnsafeZones } = useUnsafeZones();
 
   const handleZoneClick = (zone?: any) => {
-    if (!zone) {
-      setShowViewModal(true);
-      setShowEditModal(true);
-    } else if (zone.markedBy === userData.id) {
+    if (zone) {
       setSelectedZone(zone);
       setShowViewModal(true);
+    } else {
+      setShowEditModal(true);
     }
   };
 
@@ -133,7 +133,7 @@ const MapScreen = () => {
                       latitude: zone.location.coordinates[1],
                       longitude: zone.location.coordinates[0],
                     }}
-                    onPress={() => handleZoneClick()}
+                    onPress={() => handleZoneClick(zone)}
                   />
                 </React.Fragment>
               ))}
@@ -157,10 +157,15 @@ const MapScreen = () => {
               strokeWidth={2}
             />
           </MapView>
-          <UnsafeZoneModal
+          <CreateUnsafeModal
             isOpen={showViewModal}
             onClose={() => setShowViewModal(false)}
             onSubmit={onSubmit}
+            zone={selectedZone}
+          />
+          <ViewUnsafeModal
+            isOpen={showViewModal}
+            onClose={() => setShowViewModal(false)}
             zone={selectedZone}
           />
         </>
