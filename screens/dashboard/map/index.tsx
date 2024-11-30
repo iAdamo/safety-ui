@@ -10,6 +10,11 @@ import { UnsafeZoneSchemaType } from "@/components/forms/schemas/UnsafeZoneSchem
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
 
+import {
+  IUnsafeZoneResponse,
+  IUnsafeZoneRequest,
+} from "@/components/componentTypes";
+
 const MapScreen = () => {
   const {
     location,
@@ -21,10 +26,10 @@ const MapScreen = () => {
   const [showLocationError, setShowLocationError] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedZone, setSelectedZone] = useState<any>(null);
+  const [selectedZone, setSelectedZone] = useState<any | null>(null);
   const mapRef = useRef<MapView>(null);
   const { userData } = useSession();
-  const [unsafeZones, setUnsafeZones] = useState<any[]>([]);
+  const [unsafeZones, setUnsafeZones] = useState<IUnsafeZoneResponse[]>([]);
 
   // Fetch unsafe zones
   useEffect(() => {
@@ -32,13 +37,18 @@ const MapScreen = () => {
 
     const fetchUnsafeZones = async () => {
       try {
-        if (!location) return;
-        const response = await getUnsafeZone(userData.id, {
-          userLat: location.latitude,
-          userLong: location.longitude,
-          proximity: userData.proximity,
+        const response = await getUnsafeZone(userData.id || "", {
+          userLat: location?.latitude || 0,
+          userLong: location?.longitude || 0,
+          proximity: userData.proximity || 0,
         });
-        if (response) setUnsafeZones(response);
+        if (response) {
+          if (response.length === 0) {
+            setUnsafeZones([]);
+          } else {
+            setUnsafeZones(response);
+          }
+        }
       } catch (error) {
         console.error("Error fetching unsafe zones:", error);
       }
@@ -49,6 +59,8 @@ const MapScreen = () => {
 
   const handleZoneClick = (zone?: any) => {
     if (!zone) {
+      setShowViewModal(true);
+
       setShowEditModal(true);
     } else if (zone.markedBy === userData.id) {
       setSelectedZone(zone);
@@ -61,24 +73,24 @@ const MapScreen = () => {
       const {
         title,
         description,
-        proximity,
-        severity,
-        tags,
+        radius,
+        severityLevel,
+        // tags,
         image,
         video,
         audio,
       } = data;
-      const unsafeZoneData = {
+      const unsafeZoneData: IUnsafeZoneRequest = {
         markedBy: userData.id,
-        locations: {
-          type: "Point",
-          coordinates: [location?.longitude, location?.latitude],
+        location: {
+          latitude: location?.latitude,
+          longitude: location?.longitude,
         },
-        radius: proximity,
-        severityLevel: severity.toLowerCase(),
+        radius: radius,
+        severityLevel: severityLevel.toLowerCase(),
         title: title.toUpperCase(),
         description: description.trim(),
-        tags,
+        // tags,
         image,
         video,
         audio,
@@ -87,6 +99,8 @@ const MapScreen = () => {
       };
       const response = await createUnsafeZone(unsafeZoneData);
       if (response) {
+        console.log("response", response);
+
         setUnsafeZones((prevZones) => [...prevZones, response]);
         setShowEditModal(false);
       }
@@ -101,17 +115,6 @@ const MapScreen = () => {
     return (
       <VStack className="flex-1 justify-center items-center">
         <Text>Loading...</Text>
-      </VStack>
-    );
-  }
-
-  if (showLocationError) {
-    return (
-      <VStack className="flex-1 justify-center items-center">
-        <Text>{locationError}</Text>
-        <Button onPress={requestLocationPermission}>
-          <ButtonText>Retry</ButtonText>
-        </Button>
       </VStack>
     );
   }
@@ -133,37 +136,36 @@ const MapScreen = () => {
             showsUserLocation
           >
             {unsafeZones.map((zone) => (
-              <>
+              <React.Fragment key={zone._id}>
                 <Circle
-                  key={zone.id}
                   center={{
-                    latitude: zone.latitude,
-                    longitude: zone.longitude,
+                    latitude: zone.location.coordinates[1],
+                    longitude: zone.location.coordinates[0],
                   }}
                   radius={zone.radius}
                   strokeColor={
-                    zone.criticalLevel === "high"
+                    zone.severityLevel === "high"
                       ? "rgba(255,0,0,0.8)"
-                      : zone.criticalLevel === "medium"
+                      : zone.severityLevel === "medium"
                       ? "rgba(255,165,0,0.8)"
                       : "rgba(255,255,0,0.8)"
                   }
                   fillColor={
-                    zone.criticalLevel === "high"
+                    zone.severityLevel === "high"
                       ? "rgba(255,0,0,0.3)"
-                      : zone.criticalLevel === "medium"
+                      : zone.severityLevel === "medium"
                       ? "rgba(255,165,0,0.3)"
                       : "rgba(255,255,0,0.3)"
                   }
                 />
                 <Marker
                   coordinate={{
-                    latitude: zone.latitude,
-                    longitude: zone.longitude,
+                    latitude: zone.location.coordinates[1],
+                    longitude: zone.location.coordinates[0],
                   }}
-                  onPress={() => handleZoneClick(zone)}
+                  onPress={() => handleZoneClick()}
                 />
-              </>
+              </React.Fragment>
             ))}
             <Marker
               coordinate={{
@@ -174,6 +176,7 @@ const MapScreen = () => {
               onPress={() => handleZoneClick()}
             />
             <Circle
+              onPointerDown={() => handleZoneClick()}
               center={{
                 latitude: location.latitude,
                 longitude: location.longitude,

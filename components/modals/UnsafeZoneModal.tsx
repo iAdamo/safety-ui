@@ -79,123 +79,126 @@ export const UnsafeZoneModal: React.FC<UnsafeZoneModalProps> = ({
       isKeyboardDismissable={false}
       closeOnOverlayClick={false}
       avoidKeyboard={true}
+      className=""
     >
-      <ModalBackdrop>
-        <ModalContent>
-          <ModalHeader>
-            <Heading>Report Unsafe Zone</Heading>
-            <Text>Help us keep our community safe</Text>
-          </ModalHeader>
-          <ModalBody>
-            {/* Title */}
-            <FormControl isInvalid={!!errors.title}>
-              <FormControlLabel>
-                <FormControlLabelText>Title</FormControlLabelText>
-              </FormControlLabel>
-              <Controller
-                name="title"
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input>
-                    <InputField
-                      type="text"
-                      placeholder="Enter title"
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      value={value}
-                      onSubmitEditing={handleKeyPress}
-                      returnKeyType="done"
-                    />
-                  </Input>
-                )}
-              />
-              <FormControlError>
-                <FormControlErrorIcon size="md" as={AlertTriangle} />
-                <FormControlErrorText>
-                  {errors.title?.message}
-                </FormControlErrorText>
-              </FormControlError>
-            </FormControl>
-            {/* Description */}
-            <FormControl isInvalid={!!errors.description}>
-              <FormControlLabel>
-                <FormControlLabelText>Description</FormControlLabelText>
-              </FormControlLabel>
-              <Controller
-                name="description"
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Textarea>
-                    <TextareaInput
-                      placeholder="Enter description"
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      value={value}
-                      onSubmitEditing={handleKeyPress}
-                      returnKeyType="done"
-                    />
-                  </Textarea>
-                )}
-              />
-              <FormControlError>
-                <FormControlErrorIcon size="md" as={AlertTriangle} />
-                <FormControlErrorText>
-                  {errors.description?.message}
-                </FormControlErrorText>
-              </FormControlError>
-            </FormControl>
-            {/* Severity */}
-            <FormControl isInvalid={!!errors.severity}>
-              <FormControlLabel>
-                <FormControlLabelText>Severity</FormControlLabelText>
-              </FormControlLabel>
-              <Controller
-                name="severity"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <RadioGroup
+      <ModalBackdrop />
+      <ModalContent className="">
+        <ModalHeader className="justify-center bg-IndianRed items-center ">
+          <VStack>
+            <Heading className="text-center">Report Unsafe Zone</Heading>
+            <Text className="text-center">Help us keep our community safe</Text>
+          </VStack>
+        </ModalHeader>
+        <ModalBody>
+          {/* Title */}
+          <FormControl isInvalid={!!errors.title}>
+            <FormControlLabel>
+              <FormControlLabelText>Title</FormControlLabelText>
+            </FormControlLabel>
+            <Controller
+              name="title"
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input className="h-12">
+                  <InputField
+                    type="text"
+                    placeholder="Enter title"
+                    onChangeText={onChange}
+                    onBlur={onBlur}
                     value={value}
-                    onChange={onChange}
-                    accessibilityLabel="Severity"
-                  >
-                    <VStack>
-                      <Radio size="md" value="Low">
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
-                        </RadioIndicator>
-                        <RadioLabel>Low</RadioLabel>
-                      </Radio>
-                      <Radio size="md" value="Medium">
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
-                        </RadioIndicator>
-                        <RadioLabel>Medium</RadioLabel>
-                      </Radio>
-                      <Radio size="md" value="High">
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
-                        </RadioIndicator>
-                        <RadioLabel>High</RadioLabel>
-                      </Radio>
-                    </VStack>
-                  </RadioGroup>
-                )}
-              />
-              <FormControlError>
-                <FormControlErrorIcon size="md" as={AlertTriangle} />
-                <FormControlErrorText>
-                  {errors.severity?.message}
-                </FormControlErrorText>
-              </FormControlError>
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button onPress={handleSubmit(onSubmit)}>
-              <ButtonText>Submit</ButtonText>
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </ModalBackdrop>
+                    onSubmitEditing={handleKeyPress}
+                    returnKeyType="done"
+                  />
+                </Input>
+              )}
+            />
+            <FormControlError>
+              <FormControlErrorIcon size="md" as={AlertTriangle} />
+              <FormControlErrorText>
+                {errors.title?.message}
+              </FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+          {/* Description */}
+          <FormControl isInvalid={!!errors.description}>
+            <FormControlLabel>
+              <FormControlLabelText>Description</FormControlLabelText>
+            </FormControlLabel>
+            <Controller
+              name="description"
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Textarea size="sm" className="h-20">
+                  <TextareaInput
+                    placeholder="Enter description"
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                    onSubmitEditing={handleKeyPress}
+                    returnKeyType="done"
+                    className="text-left align-top h-20"
+                  />
+                </Textarea>
+              )}
+            />
+            <FormControlError>
+              <FormControlErrorIcon size="md" as={AlertTriangle} />
+              <FormControlErrorText>
+                {errors.description?.message}
+              </FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+          {/* SeverityLevel */}
+          <FormControl isInvalid={!!errors.severityLevel}>
+            <FormControlLabel>
+              <FormControlLabelText>SeverityLevel</FormControlLabelText>
+            </FormControlLabel>
+            <Controller
+              name="severityLevel"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <RadioGroup
+                  value={value}
+                  onChange={onChange}
+                  accessibilityLabel="SeverityLevel"
+                >
+                  <VStack>
+                    <Radio size="md" value="Low">
+                      <RadioIndicator>
+                        <RadioIcon as={CircleIcon} />
+                      </RadioIndicator>
+                      <RadioLabel>Low</RadioLabel>
+                    </Radio>
+                    <Radio size="md" value="Medium">
+                      <RadioIndicator>
+                        <RadioIcon as={CircleIcon} />
+                      </RadioIndicator>
+                      <RadioLabel>Medium</RadioLabel>
+                    </Radio>
+                    <Radio size="md" value="High">
+                      <RadioIndicator>
+                        <RadioIcon as={CircleIcon} />
+                      </RadioIndicator>
+                      <RadioLabel>High</RadioLabel>
+                    </Radio>
+                  </VStack>
+                </RadioGroup>
+              )}
+            />
+            <FormControlError>
+              <FormControlErrorIcon size="md" as={AlertTriangle} />
+              <FormControlErrorText>
+                {errors.severityLevel?.message}
+              </FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+        </ModalBody>
+        <ModalFooter>
+          <Button onPress={handleSubmit(onSubmit)}>
+            <ButtonText>Submit</ButtonText>
+          </Button>
+        </ModalFooter>
+      </ModalContent>
     </Modal>
   );
 };

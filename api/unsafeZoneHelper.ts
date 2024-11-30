@@ -1,11 +1,12 @@
 import axios from "axios";
+import { IUnsafeZoneRequest } from "@/components/componentTypes";
 
 const unsafeAxios = axios.create({
   baseURL: "https://r1w17jd5-3000.uks1.devtunnels.ms/api/unsafezone",
   withCredentials: true,
 });
 
-export const createUnsafeZone = async (data: any) => {
+export const createUnsafeZone = async (data: IUnsafeZoneRequest) => {
   try {
     const response = await unsafeAxios.post("create/", data);
     return response.data;

@@ -16,10 +16,12 @@ import {
 } from "@/components/ui";
 import { ArrowLeftIcon } from "lucide-react-native";
 
+import { IUnsafeZoneResponse } from "../componentTypes";
+
 interface FeedCardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  feed: { id: number; title: string; body: string };
+  feed: IUnsafeZoneResponse;
 }
 
 const FeedCardModal: React.FC<FeedCardModalProps> = ({ isOpen, onClose, feed }) => {
@@ -35,11 +37,11 @@ const FeedCardModal: React.FC<FeedCardModalProps> = ({ isOpen, onClose, feed }) 
       <ModalContent>
         <ModalHeader className="flex-col items-start gap-0.5">
           <Heading>{feed.title}</Heading>
-          <Text>{feed.body}</Text>
+          <Text>{feed.description}</Text>
           <ModalCloseButton onPress={onClose} />
         </ModalHeader>
         <ModalBody className="mb-4">
-          <Text>{feed.title}</Text>
+          <Text>{feed.description}</Text>
         </ModalBody>
         <ModalFooter className="flex-col items-start">
           <Button

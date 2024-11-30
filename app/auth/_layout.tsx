@@ -20,13 +20,14 @@ export default function AppLayout() {
   if (isLoading) {
     return null; // Keep the splash screen visible
   }
-
-  if (session && userData.verified) {
+  if (!session && !userData) {
+    return <Stack screenOptions={{ headerShown: false }} />;
+  } else if (session && userData?.verified) {
     return <Redirect href="/dashboard/feeds" />;
-  } else if (session && !userData.verified) {
+  } else if (session && !userData?.verified) {
     return (
       <VerifyCodeModal
-        email={userData.email}
+        email={userData?.email}
         isOpen={showVerifyEmailModal}
         onClose={() => setShowVerifyEmailModal(false)}
       />

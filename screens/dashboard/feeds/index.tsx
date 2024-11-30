@@ -18,11 +18,11 @@ import {
   Heading,
 } from "@/components/ui";
 
+import { IUnsafeZoneResponse } from "@/components/componentTypes";
+
 const Feeds = () => {
-  const [feeds, setFeeds] = useState<
-    { id: number; title: string; body: string }[]
-  >([]);
-  const [modalVisible, setModalVisible] = useState<{ [key: number]: boolean }>(
+  const [feeds, setFeeds] = useState<IUnsafeZoneResponse[]>([]);
+  const [modalVisible, setModalVisible] = useState<{ [key: string]: boolean }>(
     {}
   );
 
@@ -58,13 +58,7 @@ const Feeds = () => {
         });
         if (response) {
           if (response.length === 0) {
-            setFeeds([
-              {
-                id: 0,
-                title: `Your proximity - ${userData.proximity} meters is looking safe`,
-                body: "",
-              },
-            ]);
+            setFeeds([]);
           } else {
             setFeeds(response);
           }
@@ -84,20 +78,17 @@ const Feeds = () => {
     }
   }, [userData.id, location]);
 
-  const handleCardPress = (id: number) => {
-    setModalVisible((prev) => ({ ...prev, [id]: true }));
+  const handleCardPress = (_id: string) => {
+    setModalVisible((prev) => ({ ...prev, [_id]: true }));
   };
 
-  const handleCloseModal = (id: number) => {
-    setModalVisible((prev) => ({ ...prev, [id]: false }));
+  const handleCloseModal = (_id: string) => {
+    setModalVisible((prev) => ({ ...prev, [_id]: false }));
   };
 
   return (
     <Box className="flex-1">
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={"#4682B4"}
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={"#4682B4"} />
       <SafeAreaView className="h-40 bg-SteelBlue border-0 shadow-hard-5-indianred"></SafeAreaView>
       <VStack className="flex-1 p-5">
         <VStack className="h-full p-3">
@@ -107,8 +98,8 @@ const Feeds = () => {
           >
             {feeds.map((feed) => (
               <TouchableOpacity
-                key={feed.id}
-                onPress={() => handleCardPress(feed.id)}
+                key={feed._id}
+                onPress={() => handleCardPress(feed._id)}
               >
                 <Card
                   variant="elevated"
@@ -117,11 +108,11 @@ const Feeds = () => {
                   <Heading size="md" className="mb-1">
                     {feed.title}
                   </Heading>
-                  <Text size="sm">{feed.body}</Text>
+                  <Text size="sm">{feed.description}</Text>
                 </Card>
                 <FeedCardModal
-                  isOpen={modalVisible[feed.id]}
-                  onClose={() => handleCloseModal(feed.id)}
+                  isOpen={modalVisible[feed._id]}
+                  onClose={() => handleCloseModal(feed._id)}
                   feed={feed}
                 />
               </TouchableOpacity>
