@@ -1,8 +1,6 @@
 import * as React from "react";
 import PagerView from "react-native-pager-view";
 import { Image } from "expo-image";
-import { Audio } from "expo-av";
-import { useVideoPlayer, VideoView } from "expo-video";
 import { VideoPlayer } from "@/components/media/VideoScreen";
 import {
   Box,
@@ -21,6 +19,7 @@ import {
   ModalFooter,
   ModalCloseButton,
   Card,
+  Divider,
 } from "@/components/ui";
 import { CircleIcon, X as CloseIcon } from "lucide-react-native";
 import { IUnsafeZoneResponse } from "@/components/componentTypes";
@@ -34,6 +33,16 @@ interface ViewUnsafeModalProps {
 export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
   const { isOpen, onClose, zone } = props;
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+  };
+
+  const createdAt = zone?.createdAt ? new Date(zone.createdAt) : null;
+  const updatedAt = zone?.updatedAt ? new Date(zone.updatedAt) : null;
+  const isSameDate =
+    createdAt && updatedAt && createdAt.getTime() === updatedAt.getTime();
+
   return (
     <Modal
       isOpen={isOpen}
@@ -46,20 +55,13 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
       <ModalContent>
         <ModalHeader
           className={`justify-center ${
-            zone?.severityLevel === "High"
+            zone?.severityLevel === "high"
               ? "bg-IndianRed"
-              : zone?.severityLevel === "Medium"
+              : zone?.severityLevel === "medium"
               ? "bg-Khaki"
               : "bg-SteelBlue"
           } items-center`}
         >
-          <ModalCloseButton>
-            <Icon
-              as={CloseIcon}
-              size="md"
-              className="stroke-background-400 group-[:hover]/modal-close-button:stroke-background-700"
-            />
-          </ModalCloseButton>
           <VStack>
             <Heading className="text-center text-white">
               {zone?.severityLevel} Unsafe Zone
@@ -70,22 +72,30 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
           </VStack>
         </ModalHeader>
         <ModalBody>
-          <Card className="p-5 rounded-lg max-w-[360px] m-3">
-            <Text className="text-sm font-normal mb-2 text-typography-700">
-              {zone?.createdAt.toLocaleDateString() +
-                " " +
-                zone?.createdAt.toLocaleTimeString()}
-            </Text>
+          <Card className="rounded-lg border border-outline-300 mt-2 ">
+            <Text>{zone?.createdAt ? formatDate(zone.createdAt) : "N/A"}</Text>
+            {!isSameDate && (
+              <Text>
+                Updated At:{" "}
+                {zone?.updatedAt ? formatDate(zone.updatedAt) : "N/A"}
+              </Text>
+            )}
+            <Divider className="my-2 " />
+
             <VStack className="mb-6">
               <Heading size="md" className="mb-4">
                 {zone?.title}
               </Heading>
+
               <Text size="sm">{zone?.description}</Text>
             </VStack>
           </Card>
 
-          <Card>
-            <PagerView style={{ flex: 1, height: 240 }}>
+          <Card className="rounded-lg border border-outline-300 mt-2 ">
+            <PagerView
+              style={{ height: 240 }}
+              initialPage={0}
+            >
               {zone?.image && (
                 <Box className="h-60 justify-center items-center">
                   <Image

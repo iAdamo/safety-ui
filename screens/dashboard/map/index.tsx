@@ -29,6 +29,13 @@ const MapScreen = () => {
   const { userData } = useSession();
   const { unsafeZones, fetchUnsafeZones } = useUnsafeZones();
 
+  if (!location) {
+    if (locationError) {
+      setShowLocationError(true);
+    }
+    return null;
+  }
+
   const handleZoneClick = (zone?: any) => {
     if (zone) {
       setSelectedZone(zone);
@@ -53,8 +60,8 @@ const MapScreen = () => {
       const unsafeZoneData: IUnsafeZoneRequest = {
         markedBy: userData.id,
         location: {
-          latitude: location?.latitude,
-          longitude: location?.longitude,
+          type: "Point",
+          coordinates: [location.longitude, location.latitude],
         },
         radius: radius,
         severityLevel: severityLevel.toLowerCase(),
@@ -67,6 +74,7 @@ const MapScreen = () => {
         resolved: false,
         active: true,
       };
+      console.log("unsafeZoneData", unsafeZoneData);
       const response = await createUnsafeZone(unsafeZoneData);
       if (response) {
         console.log("response", response);
@@ -158,10 +166,9 @@ const MapScreen = () => {
             />
           </MapView>
           <CreateUnsafeModal
-            isOpen={showViewModal}
-            onClose={() => setShowViewModal(false)}
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
             onSubmit={onSubmit}
-            zone={selectedZone}
           />
           <ViewUnsafeModal
             isOpen={showViewModal}

@@ -5,8 +5,8 @@ export interface IUnsafeZoneRequest {
   radius?: number;
   severityLevel: string;
   location: {
-    latitude?: number;
-    longitude?: number;
+    type: "Point";
+    coordinates: [number, number];
   };
   image?: string;
   audio?: string;
@@ -25,8 +25,8 @@ export interface IUnsafeZoneResponse {
   location: {
     coordinates: [number, number];
   };
-  createdAt: Date;
-  updatedt: Date;
+  createdAt: string;
+  updatedAt: string;
   image?: string;
   audio?: string;
   video?: string;

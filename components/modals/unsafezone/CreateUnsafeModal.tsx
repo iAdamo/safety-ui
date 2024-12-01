@@ -28,13 +28,14 @@ import {
   FormControlErrorText,
   FormControlLabel,
   FormControlLabelText,
-  FormControlHelper,
-  FormControlHelperText,
   RadioGroup,
   Radio,
   RadioLabel,
   RadioIndicator,
   RadioIcon,
+  Card,
+  Icon,
+  Divider,
 } from "@/components/ui";
 import { Keyboard } from "react-native";
 import { useForm, Controller } from "react-hook-form";
@@ -44,13 +45,13 @@ import {
   UnsafeZoneSchema,
   UnsafeZoneSchemaType,
 } from "../../forms/schemas/UnsafeZoneSchema";
-import { AlertTriangle, CircleIcon } from "lucide-react-native";
+import { AlertTriangle, CircleIcon, X as CloseIcon } from "lucide-react-native";
+import { MediaPicker } from "@/components/media/Media";
 
 interface CreateUnsafeZoneModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: UnsafeZoneSchemaType) => void;
-  zone?: any;
 }
 
 export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
@@ -83,7 +84,14 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
     >
       <ModalBackdrop />
       <ModalContent className="">
-        <ModalHeader className="justify-center bg-IndianRed items-center ">
+        <ModalCloseButton onPress={onClose} className="">
+          <Icon
+            as={CloseIcon}
+            size="xl"
+            className="stroke-background-400 group-[:hover]/modal-close-button:stroke-background-700"
+          />
+        </ModalCloseButton>
+        <ModalHeader className="justify-center items-center">
           <VStack>
             <Heading className="text-center">Report Unsafe Zone</Heading>
             <Text className="text-center">Help us keep our community safe</Text>
@@ -149,6 +157,7 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
             </FormControlError>
           </FormControl>
           {/* SeverityLevel */}
+          <Divider className="my-2 " />
           <FormControl isInvalid={!!errors.severityLevel}>
             <FormControlLabel>
               <FormControlLabelText>SeverityLevel</FormControlLabelText>
@@ -162,7 +171,7 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
                   onChange={onChange}
                   accessibilityLabel="SeverityLevel"
                 >
-                  <VStack>
+                  <HStack space="2xl">
                     <Radio size="md" value="Low">
                       <RadioIndicator>
                         <RadioIcon as={CircleIcon} />
@@ -181,7 +190,7 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
                       </RadioIndicator>
                       <RadioLabel>High</RadioLabel>
                     </Radio>
-                  </VStack>
+                  </HStack>
                 </RadioGroup>
               )}
             />
@@ -192,9 +201,16 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
+          {/* Image */}
+          <Card className="rounded-lg border border-outline-300 mt-2">
+            <MediaPicker />
+          </Card>
         </ModalBody>
         <ModalFooter>
-          <Button onPress={handleSubmit(onSubmit)}>
+          <Button
+            onPress={handleSubmit(onSubmit)}
+            className="bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
+          >
             <ButtonText>Submit</ButtonText>
           </Button>
         </ModalFooter>
