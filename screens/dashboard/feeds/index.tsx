@@ -6,7 +6,7 @@ import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
 import { OptionMenu } from "@/components/menu/OptionsMenu";
 import { useUnsafeZones } from "@/hooks/useUnsafeZones";
-import useLocation from "@/hooks/GetLocation";
+import useLocation from "@/hooks/useLocation";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
 import {
   Box,

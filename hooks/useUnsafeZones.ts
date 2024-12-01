@@ -4,7 +4,7 @@ import { useStorageState } from "@/utils/UseStorageState";
 import { getUnsafeZone } from "@/api/unsafeZoneHelper";
 import { IUnsafeZoneResponse } from "@/components/componentTypes";
 import { useSession } from "@/context/AuthContext";
-import useLocation from "@/hooks/GetLocation";
+import useLocation from "@/hooks/useLocation";
 
 export function useUnsafeZones() {
   const { userData } = useSession();

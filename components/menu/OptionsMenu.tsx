@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
-import { useSignOut } from "@/hooks/SignOut";
+import { useSignOut } from "@/hooks/useSignOut";
 import {
   Menu,
   MenuItem,

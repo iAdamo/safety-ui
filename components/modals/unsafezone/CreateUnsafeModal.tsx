@@ -201,6 +201,28 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
+
+          <FormControl isInvalid={!!errors.severityLevel}>
+            <FormControlLabel>
+              <FormControlLabelText>SeverityLevel</FormControlLabelText>
+            </FormControlLabel>
+            <Controller
+              name="severityLevel"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Card></Card>
+              )}
+            />
+            <FormControlError>
+              <FormControlErrorIcon size="md" as={AlertTriangle} />
+              <FormControlErrorText>
+                {errors.severityLevel?.message}
+              </FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+
+          <FormControl></FormControl>
+
           {/* Image */}
           <Card className="rounded-lg border border-outline-300 mt-2">
             <MediaPicker />

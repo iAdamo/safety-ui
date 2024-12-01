@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle } from "react-native-maps";
-import useLocation from "@/hooks/GetLocation";
+import useLocation from "@/hooks/useLocation";
 import { useSession } from "@/context/AuthContext";
 import { Box, VStack, Text, Button, ButtonText } from "@/components/ui";
 import { StyleSheet } from "react-native";
