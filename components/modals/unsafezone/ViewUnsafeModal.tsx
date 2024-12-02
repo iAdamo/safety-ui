@@ -43,6 +43,39 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
   const isSameDate =
     createdAt && updatedAt && createdAt.getTime() === updatedAt.getTime();
 
+  const availableContent = [];
+
+  if (zone?.image) {
+    availableContent.push(
+      <Box key="image" className="flex-1 items-center justify-center">
+        <Image
+          source={{ uri: zone.image }}
+          className="h-full w-full"
+          placeholder="U$IDt2sARlja{ff7jaj@RSSgt5bHJ-j@bHaz"
+          transition={3000}
+        />
+        <Text>Swipe ➡️</Text>
+      </Box>
+    );
+  }
+
+  if (zone?.audio) {
+    availableContent.push(
+      <Box key="audio" className="flex-1 justify-center items-center">
+        <Text>Coming Soon</Text>
+      </Box>
+    );
+  }
+
+  if (zone?.video) {
+    availableContent.push(
+      <Box key="video" className="flex-1 justify-center items-center">
+        <VideoPlayer source={zone.video} />
+        <Text>Swipe ➡️</Text>
+      </Box>
+    );
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -52,7 +85,7 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
       avoidKeyboard={true}
     >
       <ModalBackdrop />
-      <ModalContent>
+      <ModalContent className="flex-1 w-full">
         <ModalHeader
           className={`justify-center ${
             zone?.severityLevel === "high"
@@ -92,38 +125,21 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
           </Card>
 
           <Card className="rounded-lg border border-outline-300 mt-2 ">
-            <PagerView
-              style={{ height: 240 }}
-              initialPage={0}
-            >
-              {zone?.image && (
-                <Box className="h-60 justify-center items-center">
-                  <Image
-                    source={{ uri: zone.image }}
-                    className="h-full w-full"
-                    placeholder={"U$IDt2sARlja{ff7jaj@RSSgt5bHJ-j@bHaz"}
-                    transition={3000}
-                  />
-                  <Text>Swipe ➡️</Text>
-                </Box>
-              )}
-              {zone?.audio && (
-                <Box className="h-60 justify-center items-center">
-                  <Text>Coming Soon</Text>
-                </Box>
-              )}
-              {zone?.video && (
-                <Box className="h-60 justify-center items-center">
-                  <VideoPlayer source={zone.video} />
-                </Box>
-              )}
-            </PagerView>
+            {availableContent.length > 0 ? (
+              <PagerView style={{ height: 320 }} initialPage={0}>
+                {availableContent}
+              </PagerView>
+            ) : (
+              <Box className="h-60 justify-center items-center">
+                <Text>No content available</Text>
+              </Box>
+            )}
           </Card>
         </ModalBody>
         <ModalFooter>
           <Button
             variant="solid"
-            className="w-full bg-Teal data-[hover=true]:bg-teal-600"
+            className="w-full bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
             onPress={onClose}
           >
             <ButtonText>Close</ButtonText>

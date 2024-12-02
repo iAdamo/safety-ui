@@ -8,6 +8,8 @@ import { OptionMenu } from "@/components/menu/OptionsMenu";
 import { useUnsafeZones } from "@/hooks/useUnsafeZones";
 import useLocation from "@/hooks/useLocation";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
+import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
+
 import {
   Box,
   Text,
@@ -25,8 +27,6 @@ const Feeds = () => {
   const { locationError, requestLocationPermission, resetError } =
     useLocation();
   const [showLocationError, setShowLocationError] = useState(false);
-
-  const router = useRouter();
 
   // Show location error modal
   useEffect(() => {
@@ -81,6 +81,7 @@ const Feeds = () => {
       <VStack className="h-16 bg-SteelBlue border-0 shadow-hard-5-steelblue absolute bottom-0 w-full"></VStack>
 
       <OptionMenu />
+
 
       {/** Location error modal */}
       <AlertModal

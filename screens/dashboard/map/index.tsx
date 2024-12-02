@@ -6,12 +6,10 @@ import { Box, VStack, Text, Button, ButtonText } from "@/components/ui";
 import { StyleSheet } from "react-native";
 import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
-import { createUnsafeZone } from "@/api/unsafeZoneHelper";
-import { UnsafeZoneSchemaType } from "@/components/forms/schemas/UnsafeZoneSchema";
+
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
 import { useUnsafeZones } from "@/hooks/useUnsafeZones";
-import { IUnsafeZoneRequest } from "@/components/componentTypes";
 
 const MapScreen = () => {
   const {
@@ -36,56 +34,22 @@ const MapScreen = () => {
     return null;
   }
 
+  // Show location error modal
+  useEffect(() => {
+    if (locationError) {
+      setShowLocationError(true);
+    }
+  }, [locationError]);
+
   const handleZoneClick = (zone?: any) => {
     if (zone) {
+      // View the zone
       setSelectedZone(zone);
       setShowViewModal(true);
     } else {
+      // Edit the zone
       setShowEditModal(true);
     }
-  };
-
-  const onSubmit = async (data: UnsafeZoneSchemaType) => {
-    try {
-      const {
-        title,
-        description,
-        radius,
-        severityLevel,
-        // tags,
-        image,
-        video,
-        audio,
-      } = data;
-      const unsafeZoneData: IUnsafeZoneRequest = {
-        markedBy: userData.id,
-        location: {
-          type: "Point",
-          coordinates: [location.longitude, location.latitude],
-        },
-        radius: radius,
-        severityLevel: severityLevel.toLowerCase(),
-        title: title.toUpperCase(),
-        description: description.trim(),
-        // tags,
-        image,
-        video,
-        audio,
-        resolved: false,
-        active: true,
-      };
-      console.log("unsafeZoneData", unsafeZoneData);
-      const response = await createUnsafeZone(unsafeZoneData);
-      if (response) {
-        console.log("response", response);
-        fetchUnsafeZones(); // Fetch updated unsafe zones
-        setShowEditModal(false);
-      }
-    } catch (error) {
-      console.error("Error creating unsafe zone:", error);
-    }
-    setSelectedZone(null);
-    setShowViewModal(false);
   };
 
   if (loading) {
@@ -168,11 +132,14 @@ const MapScreen = () => {
           <CreateUnsafeModal
             isOpen={showEditModal}
             onClose={() => setShowEditModal(false)}
-            onSubmit={onSubmit}
+            location={location}
           />
           <ViewUnsafeModal
             isOpen={showViewModal}
-            onClose={() => setShowViewModal(false)}
+            onClose={() => {
+              setSelectedZone(null);
+              setShowViewModal(false);
+            }}
             zone={selectedZone}
           />
         </>

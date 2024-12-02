@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import { useSignOut } from "@/hooks/useSignOut";
+import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
+import useLocation from "@/hooks/useLocation";
+
 import {
   Menu,
   MenuItem,
@@ -27,8 +30,14 @@ import {
 } from "lucide-react-native";
 
 const OptionMenu = () => {
+  const [showEditModal, setShowEditModal] = useState(false);
+  const { location } = useLocation();
   const signOut = useSignOut();
   const router = useRouter();
+
+  if (!location) {
+    return null;
+  }
   return (
     <Box className="absolute bottom-20 right-5">
       <VStack space="md">
@@ -95,8 +104,8 @@ const OptionMenu = () => {
           trigger={(triggerProps) => (
             <Button
               className="w-16 h-16 rounded-full bg-Khaki data-[hover=true]:bg-Khaki-600 data-[active=true]:bg-Khaki-700 shadow-hard-5"
-              onPress={() => router.push("/auth/signup")}
               {...triggerProps}
+              onPress={() => setShowEditModal(true)}
             >
               <ButtonIcon as={PlusIcon} />
             </Button>
@@ -130,6 +139,12 @@ const OptionMenu = () => {
           </TooltipContent>
         </Tooltip>
       </VStack>
+      {/** Create an unsafe zone */}
+      <CreateUnsafeModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        location={location}
+      />
     </Box>
   );
 };

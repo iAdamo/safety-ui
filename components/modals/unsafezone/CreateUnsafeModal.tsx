@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState } from "react";
 import {
   HStack,
   VStack,
@@ -41,36 +41,89 @@ import { Keyboard } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertTriangle, CircleIcon, X as CloseIcon } from "lucide-react-native";
+import { MediaPicker } from "@/components/media/Media";
+import { createUnsafeZone } from "@/api/unsafeZoneHelper";
 import {
   UnsafeZoneSchema,
   UnsafeZoneSchemaType,
-} from "../../forms/schemas/UnsafeZoneSchema";
-import { AlertTriangle, CircleIcon, X as CloseIcon } from "lucide-react-native";
-import { MediaPicker } from "@/components/media/Media";
+} from "@/components/forms/schemas/UnsafeZoneSchema";
+import { IUnsafeZoneRequest } from "@/components/componentTypes";
+import { useSession } from "@/context/AuthContext";
+import { useUnsafeZones } from "@/hooks/useUnsafeZones";
 
 interface CreateUnsafeZoneModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: UnsafeZoneSchemaType) => void;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
   isOpen,
   onClose,
-  onSubmit,
+  location,
 }) => {
   const {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<UnsafeZoneSchemaType>({
     resolver: zodResolver(UnsafeZoneSchema),
   });
+  const { userData } = useSession();
+  const { fetchUnsafeZones } = useUnsafeZones();
 
   const handleKeyPress = () => {
     Keyboard.dismiss();
     handleSubmit(onSubmit)();
+  };
+
+  const handleMediaSelect = (type: "image" | "video", uri: string) => {
+    setValue(type, uri);
+  };
+
+  const onSubmit = async (data: UnsafeZoneSchemaType) => {
+    try {
+      const {
+        title,
+        description,
+        radius,
+        severityLevel,
+        // tags,
+        image,
+        video,
+        audio,
+      } = data;
+      const unsafeZoneData: IUnsafeZoneRequest = {
+        markedBy: userData.id,
+        location: {
+          type: "Point",
+          coordinates: [location.longitude, location.latitude],
+        },
+        radius: radius,
+        severityLevel: severityLevel.toLowerCase(),
+        title: title.toUpperCase(),
+        description: description.trim(),
+        // tags,
+        image,
+        video,
+        audio,
+        resolved: false,
+        active: true,
+      };
+      const response = await createUnsafeZone(unsafeZoneData);
+      if (response) {
+        fetchUnsafeZones(); // Fetch updated unsafe zones
+        onClose;
+      }
+    } catch (error) {
+      console.error("Error creating unsafe zone:", error);
+    }
   };
 
   return (
@@ -83,8 +136,8 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
       className=""
     >
       <ModalBackdrop />
-      <ModalContent className="">
-        <ModalCloseButton onPress={onClose} className="">
+      <ModalContent className="flex-1 w-full">
+        <ModalCloseButton onPress={() => { onClose(); reset(); }} className="">
           <Icon
             as={CloseIcon}
             size="xl"
@@ -157,7 +210,7 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
             </FormControlError>
           </FormControl>
           {/* SeverityLevel */}
-          <Divider className="my-2 " />
+          <Divider className="my-4" />
           <FormControl isInvalid={!!errors.severityLevel}>
             <FormControlLabel>
               <FormControlLabelText>SeverityLevel</FormControlLabelText>
@@ -201,31 +254,11 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
-
-          <FormControl isInvalid={!!errors.severityLevel}>
-            <FormControlLabel>
-              <FormControlLabelText>SeverityLevel</FormControlLabelText>
-            </FormControlLabel>
-            <Controller
-              name="severityLevel"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Card></Card>
-              )}
-            />
-            <FormControlError>
-              <FormControlErrorIcon size="md" as={AlertTriangle} />
-              <FormControlErrorText>
-                {errors.severityLevel?.message}
-              </FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-
-          <FormControl></FormControl>
+          <Divider className="my-4" />
 
           {/* Image */}
           <Card className="rounded-lg border border-outline-300 mt-2">
-            <MediaPicker />
+            <MediaPicker onMediaSelect={handleMediaSelect} />
           </Card>
         </ModalBody>
         <ModalFooter>
