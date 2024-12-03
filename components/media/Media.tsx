@@ -3,11 +3,12 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { Pressable } from "react-native";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
+import { VideoPlayer } from "./VideoScreen";
 import {
   CameraView,
   useCameraPermissions,
+  useMicrophonePermissions,
   CameraViewProps,
-  CameraViewRef,
   CameraRecordingOptions,
 } from "expo-camera";
 import { AlertModal } from "../modals/Alert/AlertModal";
@@ -40,15 +41,8 @@ interface MediaPickerProps {
   onMediaSelect: (type: "image" | "video", uri: string) => void;
 }
 
-export const MediaPicker = ({
-  onMediaSelect,
-  ...props
-}: MediaPickerProps & CameraViewProps) => {
+export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
   const cameraRef = useRef<CameraView | null>(null);
-
-  const [maxDuration] = useState<CameraRecordingOptions>({
-    maxDuration: 10,
-  });
 
   const [mediaType, setMediaType] = useState<string | null>(null);
   const [mediaUri, setMediaUri] = useState<string | null>(null);
@@ -59,17 +53,21 @@ export const MediaPicker = ({
   const [permission, requestPermission] = useCameraPermissions();
   const [permissionError, setPermissionError] = useState<boolean>(false);
 
+  const [status, requestmicrophonePermission] = useMicrophonePermissions();
+
   const [flash, setFlash] = useState<"off" | "auto" | "on">("off");
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [mode, setMode] = useState<"picture" | "video">("picture");
 
+  // const [maxDuration] = useState<CameraRecordingOptions["maxDuration"]>(10);
+
   // Open camera
   const openCamera = async () => {
-    if (!permission) {
+    if (!permission || !status) {
       return <Box />;
     }
 
-    if (!permission.granted) {
+    if (!permission.granted || !status.granted) {
       setPermissionError(true);
     } else {
       setIsCameraOpen(true);
@@ -88,7 +86,6 @@ export const MediaPicker = ({
     if (!result.canceled) {
       setMediaType(result.assets[0].type || null);
       setMediaUri(result.assets[0].uri);
-      const mediaType = result.assets[0].type;
       if (mediaType === "image" || mediaType === "video") {
         onMediaSelect(mediaType, result.assets[0].uri);
       }
@@ -124,9 +121,10 @@ export const MediaPicker = ({
     if (!camera) return;
     const image = await camera.takePictureAsync();
     if (image) {
+      closeCamera();
       setMediaUri(image.uri);
+      setMediaType("image");
       onMediaSelect("image", image.uri);
-      camera.resumePreview();
     }
   };
 
@@ -135,11 +133,12 @@ export const MediaPicker = ({
     const camera = cameraRef.current;
     if (!camera) return;
     setIsRecording(true);
-    const video = await camera.recordAsync();
+    const video = await camera.recordAsync({ maxDuration: 10 });
     if (video) {
+      closeCamera();
       setMediaUri(video.uri);
+      setMediaType("video");
       onMediaSelect("video", video.uri);
-      camera.resumePreview();
     }
   };
 
@@ -148,13 +147,14 @@ export const MediaPicker = ({
     const camera = cameraRef.current;
     if (!camera) return;
     camera.stopRecording();
-    setIsRecording(false);
+    closeCamera();
   };
 
   // Close camera
-  const closeCamera = () => {
+  function closeCamera(): void {
     setIsCameraOpen(false);
-  };
+    setIsRecording(false);
+  }
 
   return (
     <VStack>
@@ -168,22 +168,25 @@ export const MediaPicker = ({
         </Button>
         <Button
           onPress={openGallery}
-          className="bg-blue-400 data-[hover=true]:bg-blue-600 data-[active=true]:bg-blue-700"
+          className="bg-blue-400 data-[hover=true]:bg-blue-600 data-[active=true]:bg-blue-700 mb-2"
         >
           <ButtonIcon as={ImagePlusIcon} className="" size="xl" color="white" />
           <ButtonText>Open Gallery</ButtonText>
         </Button>
       </VStack>
       {/** handle picked media */}
-      {mediaUri && (
-        <View style={styles.mediaPreview}>
-          <Image
-            source={{ uri: mediaUri }}
-            transition={3000}
-            style={styles.mediaImage}
-          />
-        </View>
-      )}
+      {mediaUri &&
+        (mediaType === "image" ? (
+          <View style={styles.mediaPreview}>
+            <Image
+              source={{ uri: mediaUri }}
+              transition={3000}
+              style={styles.mediaImage}
+            />
+          </View>
+        ) : mediaType === "video" ? (
+          <VideoPlayer source={mediaUri} />
+        ) : null)}
       {/** Camera modal */}
       <Modal visible={isCameraOpen} animationType="slide" transparent={false}>
         <View style={styles.modalContainer}>
@@ -192,11 +195,11 @@ export const MediaPicker = ({
             facing={facing}
             mode={mode}
             flash={flash}
+            zoom={1}
             enableTorch={flash === "on"}
             ref={cameraRef}
             ratio="1:1"
             active={isCameraOpen}
-            onCameraReady={() => maxDuration}
           />
 
           <HStack className="absolute top-5 left-5 right-5 justify-between">
@@ -220,26 +223,65 @@ export const MediaPicker = ({
 
           <HStack className="absolute bottom-20 left-5 right-5 justify-between">
             {/** Camera controls */}
+            <Button
+              onPress={openGallery}
+              className="bg-transparent w-12 h-12 data-[hover=true]:bg-transparent data-[active=true]:bg-transparent"
+            >
+              <ButtonIcon as={ImagePlusIcon} className="w-10 h-10" />
+            </Button>
             {mode === "picture" ? (
-              <Button onPress={captureImage}>
-                <ButtonIcon as={CameraIcon} size="lg" className="" />
+              <Button
+                onPress={captureImage}
+                className="bg-transparent w-20 h-20 data-[hover=true]:bg-transparent data-[active=true]:bg-primary-200 rounded-full"
+              >
+                <ButtonIcon as={CircleIcon} className="w-20 h-20" />
               </Button>
             ) : (
               <>
                 {/** Video controls */}
                 {isRecording ? (
-                  <Button onPress={stopRecording}>
-                    <ButtonIcon as={PauseCircleIcon} size="lg" />
+                  <Button
+                    onPress={stopRecording}
+                    className="bg-transparent w-20 h-20 data-[hover=true]:bg-transparent data-[active=true]:bg-transparent"
+                  >
+                    <ButtonIcon as={PauseCircleIcon} className="w-20 h-20" />
                   </Button>
                 ) : (
-                  <Button onPress={captureVideo}>
-                    <ButtonIcon as={VideoIcon} size="lg" />
+                  <Button
+                    onPress={captureVideo}
+                    className="bg-transparent w-20 h-20 data-[hover=true]:bg-transparent data-[active=true]:bg-transparent"
+                  >
+                    <ButtonIcon as={CircleIcon} className="w-20 h-20" />
                   </Button>
                 )}
               </>
             )}
-            <Button onPress={toggleCameraFacing}>
-              <ButtonIcon as={SwitchCameraIcon} size="lg" />
+            <Button
+              onPress={toggleCameraFacing}
+              className="w-12 h-12 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent"
+            >
+              <ButtonIcon as={SwitchCameraIcon} className="w-10 h-10" />
+            </Button>
+          </HStack>
+          <HStack
+            className={
+              mode === "picture"
+                ? "absolute bottom-5 justify-between left-40 right-18"
+                : "absolute bottom-5 justify-between left-18 right-40"
+            }
+          >
+            {/** Camera mode */}
+            <Button
+              onPress={toggleCameraMode}
+              className="bg-transparent marker:w-24 h-10 data-[hover=true]:bg-transparent data-[active=true]:bg-transparent"
+            >
+              <ButtonText>Picture</ButtonText>
+            </Button>
+            <Button
+              onPress={toggleCameraMode}
+              className="w-24 h-10 bg-transparent data-[hover=true]:bg-transparent data-[active=true]:bg-transparent"
+            >
+              <ButtonText>Video </ButtonText>
             </Button>
           </HStack>
         </View>
@@ -251,7 +293,9 @@ export const MediaPicker = ({
         headerText="Camera Permission"
         bodyText="Please grant camera permission to use this feature."
         buttonOnePress={() => {
-          setPermissionError(false), requestPermission();
+          requestPermission(),
+            requestmicrophonePermission(),
+            setPermissionError(false);
         }}
         buttonOneText="Grant Permission"
         buttonTwoText="Exit"
@@ -279,7 +323,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   mediaPreview: {
-    marginTop: 20,
     alignItems: "center",
   },
   mediaImage: {
