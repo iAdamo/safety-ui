@@ -26,33 +26,28 @@ export const MediaPreview = (props: MediaPreviewModalProps) => {
   };
 
   const saveMedia = async (uri: string, mediaType: "image" | "video") => {
-    try {
-      const hasPermission = await mediaPermission();
-      if (!hasPermission) {
-        return;
-      }
+   try {
+     const hasPermission = await mediaPermission();
+     if (!hasPermission) {
+       return;
+     }
 
-      const baseDir = `${FileSystem.documentDirectory}SafetyPro`;
-      const dirPath =
-        mediaType === "image" ? `${baseDir}/Images` : `${baseDir}/Videos`;
+     const albumName =
+       mediaType === "image" ? "SafetyPro/Images" : "SafetyPro/Videos";
 
-      const { exists } = await FileSystem.getInfoAsync(dirPath);
-      if (!exists) {
-        await FileSystem.makeDirectoryAsync(dirPath, { intermediates: true });
-      }
+     const asset = await MediaLibrary.createAssetAsync(uri);
 
-      const extension = uri.split(".").pop();
-      const filePath = `${dirPath}/${Date.now()}.${extension}`;
+     let album = await MediaLibrary.getAlbumAsync(albumName);
+     if (!album) {
+       album = await MediaLibrary.createAlbumAsync(albumName, asset, false);
+     } else {
+       await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+     }
 
-      await FileSystem.moveAsync({ from: uri, to: filePath });
-
-      const asset = await MediaLibrary.createAssetAsync(filePath);
-      console.log("Asset created", asset);
-
-      return filePath;
-    } catch (error) {
-      console.error("Error saving media", error);
-    }
+     return asset.uri;
+   } catch (error) {
+     console.error("Error saving media:", error);
+   }
   };
 
   return (
@@ -73,7 +68,9 @@ export const MediaPreview = (props: MediaPreviewModalProps) => {
         {/* Save Media Button */}
         <TouchableOpacity
           style={styles.saveButton}
-          onPress={() => onNext()}
+          onPress={() => {
+            onNext(), saveMedia(source, mediaType);
+          }}
         >
           <Ionicons name="arrow-down-circle" size={32} color="white" />
         </TouchableOpacity>
@@ -85,7 +82,7 @@ export const MediaPreview = (props: MediaPreviewModalProps) => {
 const styles = StyleSheet.create({
   modalView: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "black",
   },
   closeButton: {
     position: "absolute",

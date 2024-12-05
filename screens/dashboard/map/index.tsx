@@ -34,13 +34,6 @@ const MapScreen = () => {
     return null;
   }
 
-  // Show location error modal
-  useEffect(() => {
-    if (locationError) {
-      setShowLocationError(true);
-    }
-  }, [locationError]);
-
   const handleZoneClick = (zone?: any) => {
     if (zone) {
       // View the zone

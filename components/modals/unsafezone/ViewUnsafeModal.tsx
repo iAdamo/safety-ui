@@ -50,9 +50,7 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
       <Box key="image" className="flex-1 items-center justify-center">
         <Image
           source={{ uri: zone.image }}
-          className="h-full w-full"
-          placeholder="U$IDt2sARlja{ff7jaj@RSSgt5bHJ-j@bHaz"
-          transition={3000}
+          style={{ flex: 1, width: "100%", height: "100%" }}
         />
         <Text>Swipe ➡️</Text>
       </Box>

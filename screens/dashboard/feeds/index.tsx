@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
 import { OptionMenu } from "@/components/menu/OptionsMenu";
 import { useUnsafeZones } from "@/hooks/useUnsafeZones";
 import useLocation from "@/hooks/useLocation";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
-import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
 
 import {
   Box,
@@ -28,12 +26,19 @@ const Feeds = () => {
     useLocation();
   const [showLocationError, setShowLocationError] = useState(false);
 
+  fetchUnsafeZones();
+  if (loading) {
+    return (
+      <VStack className="flex-1 justify-center items-center">
+        <Text>Loading...</Text>
+      </VStack>
+    );
+  }
+
   // Show location error modal
-  useEffect(() => {
-    if (locationError) {
-      setShowLocationError(true);
-    }
-  }, [locationError]);
+  if (locationError) {
+    setShowLocationError(true);
+  }
 
   const handleCardPress = (_id: string) => {
     setModalVisible((prev) => ({ ...prev, [_id]: true }));
@@ -47,10 +52,10 @@ const Feeds = () => {
     <Box className="flex-1">
       <StatusBar barStyle="dark-content" backgroundColor={"#4682B4"} />
       <SafeAreaView className="h-40 bg-SteelBlue border-0 shadow-hard-5-indianred"></SafeAreaView>
-      <VStack className="flex-1 p-5">
+      <VStack className="flex-1 px-5 pb-16">
         <VStack className="h-full p-3">
           <ScrollView
-            className="flex-col h-full pt-3"
+            className="flex-col h-full "
             showsVerticalScrollIndicator={false}
           >
             {unsafeZones &&
@@ -61,7 +66,13 @@ const Feeds = () => {
                 >
                   <Card
                     variant="elevated"
-                    className="mb-3 shadow-SteelBlue shadow-sm bg-primary"
+                    className={`mb-3 ${
+                      feed?.severityLevel === "high"
+                        ? "shadow-IndianRed"
+                        : feed?.severityLevel === "medium"
+                        ? "shadow-Khaki"
+                        : "shadow-SteelBlue"
+                    } shadow-sm bg-primary`}
                   >
                     <Heading size="md" className="mb-1">
                       {feed.title}
@@ -81,7 +92,6 @@ const Feeds = () => {
       <VStack className="h-16 bg-SteelBlue border-0 shadow-hard-5-steelblue absolute bottom-0 w-full"></VStack>
 
       <OptionMenu />
-
 
       {/** Location error modal */}
       <AlertModal

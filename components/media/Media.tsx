@@ -177,7 +177,7 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
           <ButtonText>Open Gallery</ButtonText>
         </Button>
       </VStack>
-      {/** handle picked media */}
+      {/** Preview media */}
       <MediaPreview
         isOpen={showPreview}
         mediaType={mediaType}
@@ -196,7 +196,7 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
             facing={facing}
             mode={mode}
             flash={flash}
-            zoom={1}
+            zoom={0}
             enableTorch={flash === "on"}
             ref={cameraRef}
             ratio="1:1"
@@ -204,7 +204,7 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
           />
 
           <HStack className="absolute top-5 left-5 right-5 justify-between">
-            <Button onPress={() => handleCameraClose}>
+            <Button onPress={() => handleCameraClose()}>
               <ButtonIcon
                 as={CloseIcon}
                 size="xl"

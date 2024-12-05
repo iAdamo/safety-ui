@@ -247,6 +247,9 @@ const Login = () => {
       </VStack>
       <Center className="">
         <Text size="2xs" className="text-primary-100">
+          Powered By
+        </Text>
+        <Text size="2xs" className="text-primary-100">
           Sanux Technologies
         </Text>
       </Center>

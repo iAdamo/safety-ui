@@ -75,6 +75,7 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
   } = useForm<UnsafeZoneSchemaType>({
     resolver: zodResolver(UnsafeZoneSchema),
   });
+  const [loading, setLoading] = useState(false);
   const { userData } = useSession();
   const { fetchUnsafeZones } = useUnsafeZones();
 
@@ -89,6 +90,7 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
 
   const onSubmit = async (data: UnsafeZoneSchemaType) => {
     try {
+      setLoading(true);
       const {
         title,
         description,
@@ -119,10 +121,13 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
       const response = await createUnsafeZone(unsafeZoneData);
       if (response) {
         fetchUnsafeZones(); // Fetch updated unsafe zones
-        onClose;
       }
     } catch (error) {
       console.error("Error creating unsafe zone:", error);
+    } finally {
+      reset();
+      setLoading(false);
+      onClose();
     }
   };
 
@@ -137,7 +142,13 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
     >
       <ModalBackdrop />
       <ModalContent className="flex-1 w-full">
-        <ModalCloseButton onPress={() => { onClose(); reset(); }} className="">
+        <ModalCloseButton
+          onPress={() => {
+            onClose();
+            reset();
+          }}
+          className=""
+        >
           <Icon
             as={CloseIcon}
             size="xl"
@@ -264,9 +275,10 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
         <ModalFooter>
           <Button
             onPress={handleSubmit(onSubmit)}
+            disabled={loading}
             className="bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
           >
-            <ButtonText>Submit</ButtonText>
+            <ButtonText>{loading? "Please Wait..." : "Submit"}</ButtonText>
           </Button>
         </ModalFooter>
       </ModalContent>
