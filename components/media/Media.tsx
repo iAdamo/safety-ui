@@ -1,22 +1,17 @@
 import React, { useRef, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
-import { Pressable } from "react-native";
-import { Image } from "expo-image";
+import { View, StyleSheet, Modal } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { VideoPlayer } from "./VideoScreen";
+import { MediaPreview } from "./MediaPreview";
 import {
   CameraView,
   useCameraPermissions,
   useMicrophonePermissions,
-  CameraViewProps,
-  CameraRecordingOptions,
 } from "expo-camera";
 import { AlertModal } from "../modals/Alert/AlertModal";
 import {
   CircleIcon,
   X as CloseIcon,
   CameraIcon,
-  VideoIcon,
   ImagePlusIcon,
   SwitchCameraIcon,
   PauseCircleIcon,
@@ -29,12 +24,9 @@ import {
   Box,
   HStack,
   VStack,
-  Heading,
   Button,
   ButtonIcon,
   ButtonText,
-  Icon,
-  Card,
 } from "@/components/ui";
 
 interface MediaPickerProps {
@@ -44,11 +36,12 @@ interface MediaPickerProps {
 export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
   const cameraRef = useRef<CameraView | null>(null);
 
-  const [mediaType, setMediaType] = useState<string | null>(null);
-  const [mediaUri, setMediaUri] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<"image" | "video">("image");
+  const [mediaUri, setMediaUri] = useState<string>("");
 
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [permissionError, setPermissionError] = useState<boolean>(false);
@@ -84,7 +77,12 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
     });
 
     if (!result.canceled) {
-      setMediaType(result.assets[0].type || null);
+      if (
+        result.assets[0].type === "image" ||
+        result.assets[0].type === "video"
+      ) {
+        setMediaType(result.assets[0].type);
+      }
       setMediaUri(result.assets[0].uri);
       if (mediaType === "image" || mediaType === "video") {
         onMediaSelect(mediaType, result.assets[0].uri);
@@ -121,10 +119,11 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
     if (!camera) return;
     const image = await camera.takePictureAsync();
     if (image) {
-      closeCamera();
       setMediaUri(image.uri);
       setMediaType("image");
       onMediaSelect("image", image.uri);
+      camera.pausePreview();
+      setShowPreview(true);
     }
   };
 
@@ -135,10 +134,12 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
     setIsRecording(true);
     const video = await camera.recordAsync({ maxDuration: 10 });
     if (video) {
-      closeCamera();
       setMediaUri(video.uri);
       setMediaType("video");
       onMediaSelect("video", video.uri);
+      setIsRecording(false);
+      camera.pausePreview();
+      setShowPreview(true);
     }
   };
 
@@ -147,14 +148,16 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
     const camera = cameraRef.current;
     if (!camera) return;
     camera.stopRecording();
-    closeCamera();
+    setIsRecording(false);
   };
 
   // Close camera
-  function closeCamera(): void {
-    setIsCameraOpen(false);
+  const handleCameraClose = () => {
     setIsRecording(false);
-  }
+    setShowPreview(false);
+    setMediaUri("");
+    setIsCameraOpen(false);
+  };
 
   return (
     <VStack>
@@ -175,18 +178,16 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
         </Button>
       </VStack>
       {/** handle picked media */}
-      {mediaUri &&
-        (mediaType === "image" ? (
-          <View style={styles.mediaPreview}>
-            <Image
-              source={{ uri: mediaUri }}
-              transition={3000}
-              style={styles.mediaImage}
-            />
-          </View>
-        ) : mediaType === "video" ? (
-          <VideoPlayer source={mediaUri} />
-        ) : null)}
+      <MediaPreview
+        isOpen={showPreview}
+        mediaType={mediaType}
+        source={mediaUri}
+        onClose={() => {
+          setShowPreview(false);
+          cameraRef.current?.resumePreview();
+        }}
+        onNext={() => handleCameraClose()}
+      />
       {/** Camera modal */}
       <Modal visible={isCameraOpen} animationType="slide" transparent={false}>
         <View style={styles.modalContainer}>
@@ -203,7 +204,7 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
           />
 
           <HStack className="absolute top-5 left-5 right-5 justify-between">
-            <Button onPress={closeCamera}>
+            <Button onPress={() => handleCameraClose}>
               <ButtonIcon
                 as={CloseIcon}
                 size="xl"
