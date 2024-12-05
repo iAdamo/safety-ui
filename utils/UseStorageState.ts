@@ -1,4 +1,5 @@
 import { useEffect, useCallback, useReducer } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
@@ -28,10 +29,18 @@ export async function setStorageItemAsync(key: string, value: string | null) {
       console.error("Local storage is unavailable:", e);
     }
   } else {
-    if (value == null) {
-      await SecureStore.deleteItemAsync(key);
+    if (key === "unsafeZones") {
+      if (value == null) {
+        await AsyncStorage.removeItem(key);
+      } else {
+        await AsyncStorage.setItem(key, value);
+      }
     } else {
-      await SecureStore.setItemAsync(key, value);
+      if (value == null) {
+        await SecureStore.deleteItemAsync(key);
+      } else {
+        await SecureStore.setItemAsync(key, value);
+      }
     }
   }
 }
@@ -51,7 +60,12 @@ export function useStorageState<T>(key: string): UseStateHook<T> {
           console.error("Local storage is unavailable:", e);
         }
       } else {
-        const value = await SecureStore.getItemAsync(key);
+        let value;
+        if (key === "unsafeZones") {
+          value = await AsyncStorage.getItem(key);
+        } else {
+          value = await SecureStore.getItemAsync(key);
+        }
         setState(value ? JSON.parse(value) : null);
       }
     };

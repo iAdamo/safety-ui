@@ -55,7 +55,7 @@ const Feeds = () => {
       <VStack className="flex-1 px-5 pb-16">
         <VStack className="h-full p-3">
           <ScrollView
-            className="flex-col h-full "
+            className="flex-col h-full"
             showsVerticalScrollIndicator={false}
           >
             {unsafeZones &&

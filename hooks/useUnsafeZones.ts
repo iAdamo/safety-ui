@@ -1,4 +1,3 @@
-// hooks/useUnsafeZones.ts
 import { useEffect, useCallback } from "react";
 import { useStorageState } from "@/utils/UseStorageState";
 import { getUnsafeZone } from "@/api/unsafeZoneHelper";
