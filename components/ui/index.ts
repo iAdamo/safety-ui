@@ -24,3 +24,4 @@ export * from "./badge";
 export * from "./textarea";
 export * from "./radio";
 export * from "./divider";
+export * from "./fab";

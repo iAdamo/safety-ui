@@ -3,11 +3,19 @@ import { StatusBar } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
-import { OptionMenu } from "@/components/menu/OptionsMenu";
 import { useUnsafeZones } from "@/hooks/useUnsafeZones";
 import useLocation from "@/hooks/useLocation";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
-
+import { useRouter } from "expo-router";
+import { useSignOut } from "@/hooks/useSignOut";
+import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
+import {
+  ArrowLeftIcon,
+  PlusIcon,
+  MapPinIcon,
+  SettingsIcon,
+  PanelTopOpenIcon,
+} from "lucide-react-native";
 import {
   Box,
   Text,
@@ -15,6 +23,22 @@ import {
   SafeAreaView,
   Card,
   Heading,
+  Menu,
+  MenuItem,
+  MenuItemLabel,
+  MenuSeparator,
+  Badge,
+  BadgeIcon,
+  BadgeText,
+  Button,
+  ButtonIcon,
+  Icon,
+  Tooltip,
+  TooltipContent,
+  TooltipText,
+  Fab,
+  FabIcon,
+  Divider,
 } from "@/components/ui";
 
 const Feeds = () => {
@@ -22,9 +46,14 @@ const Feeds = () => {
     {}
   );
   const { unsafeZones, loading, fetchUnsafeZones } = useUnsafeZones();
-  const { locationError, requestLocationPermission, resetError } =
+  const { location, locationError, requestLocationPermission, resetError } =
     useLocation();
   const [showLocationError, setShowLocationError] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const signOut: () => void = useSignOut();
+  const router = useRouter();
 
   fetchUnsafeZones();
   if (loading) {
@@ -66,14 +95,18 @@ const Feeds = () => {
                 >
                   <Card
                     variant="elevated"
-                    className={`mb-3 ${
-                      feed?.severityLevel === "high"
-                        ? "shadow-IndianRed"
-                        : feed?.severityLevel === "medium"
-                        ? "shadow-Khaki"
-                        : "shadow-SteelBlue"
-                    } shadow-sm bg-primary`}
+                    className={`mb-3  shadow-red-900 shadow-lg`}
                   >
+                    <Divider
+                      className={`mb-2 h-1 mx-56 -mt-3 ${
+                        feed?.severityLevel === "high"
+                          ? "bg-IndianRed"
+                          : feed?.severityLevel === "medium"
+                          ? "bg-Khaki"
+                          : "bg-SteelBlue"
+                      }`}
+                    />
+
                     <Heading size="md" className="mb-1">
                       {feed.title}
                     </Heading>
@@ -91,7 +124,95 @@ const Feeds = () => {
       </VStack>
       <VStack className="h-16 bg-SteelBlue border-0 shadow-hard-5-steelblue absolute bottom-0 w-full"></VStack>
 
-      <OptionMenu />
+      <VStack className="absolute bottom-20 bg-red-300 -right-2 gap-20">
+        <Box>
+          <Menu
+            offset={5}
+            placement="left"
+            trigger={({ ...triggerProps }) => {
+              return (
+                <Fab
+                  className="w-16 h-16 rounded-full bg-primary-950 data-[hover=true]:bg-primary-200 data-[active=true]:bg-primary-500 shadow-hard-5"
+                  placement="bottom right"
+                  {...triggerProps}
+                >
+                  <FabIcon as={SettingsIcon} />
+                </Fab>
+              );
+            }}
+          >
+            <MenuItem
+              key="Membership"
+              textValue="Membership"
+              className="p-2 justify-between"
+            >
+              <MenuItemLabel size="sm">Membership</MenuItemLabel>
+              <Badge action="success" className="rounded-full">
+                <BadgeText className="text-2xs capitalize">Pro</BadgeText>
+              </Badge>
+            </MenuItem>
+            <MenuItem key="Orders" textValue="Orders" className="p-2">
+              <MenuItemLabel size="sm">Orders</MenuItemLabel>
+            </MenuItem>
+            <MenuItem
+              key="Address Book"
+              textValue="Address Book"
+              className="p-2"
+            >
+              <MenuItemLabel size="sm">Address Book</MenuItemLabel>
+            </MenuItem>
+            <MenuSeparator />
+            <MenuItem
+              key="Earn & Redeem"
+              textValue="Earn & Redeem"
+              className="p-2"
+            >
+              <MenuItemLabel size="sm">Earn & Redeem</MenuItemLabel>
+            </MenuItem>
+            <MenuItem key="Help Center" textValue="Help Center" className="p-2">
+              <MenuItemLabel size="sm">Help Center</MenuItemLabel>
+            </MenuItem>
+            <MenuSeparator />
+            <MenuItem
+              key="Logout"
+              textValue="Logout"
+              className="p-2"
+              onPress={() => {
+                signOut();
+                router.push("/auth/signin");
+              }}
+            >
+              <MenuItemLabel size="sm">Logout</MenuItemLabel>
+            </MenuItem>
+          </Menu>
+        </Box>
+        <Box>
+          <Fab
+            className="w-16 h-16 rounded-full bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700 shadow-hard-5"
+            placement="bottom right"
+          >
+            <FabIcon as={PanelTopOpenIcon} />
+          </Fab>
+        </Box>
+        <Box>
+          <Fab
+            className="w-16 h-16 rounded-full bg-Khaki data-[hover=true]:bg-Khaki-600 data-[active=true]:bg-Khaki-700 shadow-hard-5"
+            placement="bottom right"
+            onPress={() => router.push("/dashboard/map")}
+          >
+            <FabIcon as={MapPinIcon} />
+          </Fab>
+        </Box>
+        <Box>
+          <Fab
+            className="w-16 h-16 rounded-full bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700 shadow-hard-5"
+            placement="bottom right"
+            onPress={() => setShowEditModal(true)}
+          >
+            <FabIcon as={PlusIcon} />
+          </Fab>
+        </Box>
+      </VStack>
 
       {/** Location error modal */}
       <AlertModal
@@ -109,6 +230,14 @@ const Feeds = () => {
           closeApp();
         }}
       />
+      {/** Create an unsafe zone */}
+      {location && (
+        <CreateUnsafeModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          location={location}
+        />
+      )}
     </Box>
   );
 };
