@@ -1,5 +1,6 @@
 module.exports = function (api) {
   api.cache(true);
+
   return {
     presets: [
       [
@@ -9,6 +10,20 @@ module.exports = function (api) {
         },
       ],
       "nativewind/babel",
+    ],
+
+    plugins: [
+      [
+        "module-resolver",
+        {
+          root: ["./"],
+
+          alias: {
+            "@": "./",
+            "tailwind.config": "./tailwind.config.js",
+          },
+        },
+      ],
     ],
   };
 };
