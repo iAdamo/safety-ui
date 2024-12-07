@@ -30,8 +30,8 @@ export function useUnsafeZones() {
 
   useEffect(() => {
     fetchUnsafeZones();
-    const intervalId = setInterval(fetchUnsafeZones, 300000); // Update every 5 minutes
-    return () => clearInterval(intervalId); // Clear interval on component unmount
+    const intervalId = setInterval(fetchUnsafeZones, 300000);
+    return () => clearInterval(intervalId);
   }, [fetchUnsafeZones]);
 
   return {

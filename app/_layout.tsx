@@ -33,7 +33,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync().then(() => {
-        router.push("/auth/signin");
+        router.push("/");
       });
     }
   }, [loaded]);

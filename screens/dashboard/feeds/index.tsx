@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { StatusBar } from "react-native";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity, RefreshControl } from "react-native";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
 import { useUnsafeZones } from "@/hooks/useUnsafeZones";
@@ -10,7 +10,6 @@ import { useRouter } from "expo-router";
 import { useSignOut } from "@/hooks/useSignOut";
 import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
 import {
-  ArrowLeftIcon,
   PlusIcon,
   MapPinIcon,
   SettingsIcon,
@@ -28,14 +27,7 @@ import {
   MenuItemLabel,
   MenuSeparator,
   Badge,
-  BadgeIcon,
   BadgeText,
-  Button,
-  ButtonIcon,
-  Icon,
-  Tooltip,
-  TooltipContent,
-  TooltipText,
   Fab,
   FabIcon,
   Divider,
@@ -49,13 +41,22 @@ const Feeds = () => {
   const { location, locationError, requestLocationPermission, resetError } =
     useLocation();
   const [showLocationError, setShowLocationError] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const signOut: () => void = useSignOut();
+  useEffect(() => {
+    fetchUnsafeZones();
+  }, [fetchUnsafeZones]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchUnsafeZones();
+    setRefreshing(false);
+  };
+
+  const signOut = useSignOut();
   const router = useRouter();
 
-  fetchUnsafeZones();
   if (loading) {
     return (
       <VStack className="flex-1 justify-center items-center">
@@ -86,6 +87,13 @@ const Feeds = () => {
           <ScrollView
             className="flex-col h-full"
             showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={["#4682B4"]}
+              />
+            }
           >
             {unsafeZones &&
               unsafeZones.map((feed) => (
