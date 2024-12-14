@@ -71,7 +71,7 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
   const openGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images", "videos"],
-      allowsEditing: true,
+      allowsEditing: false,
       aspect: [4, 3],
       quality: 1,
     });

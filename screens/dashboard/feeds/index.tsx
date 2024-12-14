@@ -103,7 +103,7 @@ const Feeds = () => {
                 >
                   <Card
                     variant="elevated"
-                    className={`mb-3  shadow-red-900 shadow-lg`}
+                    className={`mb-3 shadow-lg`}
                   >
                     <Divider
                       className={`mb-2 h-1 mx-56 -mt-3 ${

@@ -49,7 +49,7 @@ const Login = () => {
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { login } = useSession();
-  const [ isLoading, setIsLoading ] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   const toast = useToast();
@@ -75,6 +75,7 @@ const Login = () => {
 
   // handle form submission
   const onSubmit = async (data: FormSchemaType) => {
+    Keyboard.dismiss();
     setIsLoading(true);
     try {
       await login(data);
@@ -85,12 +86,12 @@ const Login = () => {
         (error as any).response?.data?.message || "An unexpected error occurred"
       );
       toast.show({
-        placement: "bottom left",
+        placement: "top",
         duration: 5000,
         render: ({ id }) => {
           return (
             <Toast nativeID={id} variant="outline" action="error">
-              <ToastTitle>{(error as any).response?.data?.message}</ToastTitle>
+              <ToastTitle>{errorMessage}</ToastTitle>
             </Toast>
           );
         },
@@ -120,13 +121,12 @@ const Login = () => {
     <Box className="flex-1">
       <StatusBar
         barStyle="dark-content"
-        translucent={true}
         backgroundColor={"#CD5C5C"}
       />
 
-      <SafeAreaView className="h-[160px] bg-IndianRed border-0 shadow-hard-5-indianred"></SafeAreaView>
+      <SafeAreaView className="h-48 bg-IndianRed"></SafeAreaView>
       <VStack className="flex max-w-full pt-14 flex-col items-center">
-        <VStack className="flex border-1 shadow-hard-5 p-5 mx-5 mb-5 flex-col items-center gap-6">
+        <VStack className="flex p-5 mx-5 mb-5 flex-col items-center gap-6">
           <FormControl
             className=" w-80"
             isInvalid={!!errors?.email || !validated.emailValid}
@@ -218,6 +218,7 @@ const Login = () => {
           </FormControl>
           <VStack className="w-80 ">
             <Button
+              isDisabled={isLoading}
               className="w-full h-12 bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
               onPress={handleSubmit(onSubmit)}
             >

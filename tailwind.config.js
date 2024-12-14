@@ -13,6 +13,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        Auto: "#F2F2F2",
         Crimson: {
           DEFAULT: "#DC143C",
           600: "#C11237",

@@ -57,6 +57,9 @@ const SignUp = () => {
     },
   ]);
   const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -71,10 +74,12 @@ const SignUp = () => {
   const toast = useToast();
 
   const onSubmit = async (data: FormSchemaType) => {
+    Keyboard.dismiss();
+    setIsLoading(true);
     if (data.password !== data.confirmPassword) {
       toast.show({
-        placement: "bottom left",
-        duration: 5000,
+        placement: "top",
+        duration: 1000,
         render: ({ id }) => {
           return (
             <Toast nativeID={id} variant="outline" action="error">
@@ -83,6 +88,8 @@ const SignUp = () => {
           );
         },
       });
+      setIsLoading(false);
+      return;
     } else {
       try {
         const response = (await registerUser({
@@ -92,7 +99,7 @@ const SignUp = () => {
         if (response) {
           await sendCode({ email: data.email });
           toast.show({
-            placement: "bottom left",
+            placement: "top",
             duration: 3000,
             render: ({ id }) => {
               return (
@@ -105,19 +112,22 @@ const SignUp = () => {
           setShowVerifyEmailModal(true);
         }
       } catch (error) {
+        setErrorMessage(
+          (error as any).response?.data || "An unexpected error occurred"
+        );
         toast.show({
-          placement: "bottom left",
+          placement: "top",
           duration: 3000,
           render: ({ id }) => {
             return (
               <Toast nativeID={id} variant="outline" action="error">
-                <ToastTitle>
-                  {(error as any).response?.data?.message}
-                </ToastTitle>
+                <ToastTitle>{errorMessage}</ToastTitle>
               </Toast>
             );
           },
         });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -141,24 +151,18 @@ const SignUp = () => {
 
   return (
     <Box className="flex-1">
-      {isMobile && (
-        <SafeAreaView className="flex h-[160px] bg-Teal"></SafeAreaView>
-      )}
+      {isMobile && <SafeAreaView className="flex h-48 bg-Teal"></SafeAreaView>}
       {!isMobile && (
         <Box className="hidden md:flex md:flex-col md:w-1/4 md:h-full md:bg-Teal md:fixed md:left-0"></Box>
       )}
-      <StatusBar
-        barStyle="dark-content"
-        translucent={true}
-        backgroundColor={"#008080"}
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={"#008080"} />
       <VStack
         className={`flex-1 max-w-full flex-col justify-center ${
-          isMobile ? "pt-10" : "pt-20 md:ml-1/4"
+          isMobile ? "pt-5" : "pt-20 md:ml-1/4"
         }`}
       >
-        <VStack className="flex-col items-center">
-          <VStack className="border-1 shadow-hard-5 p-5 pb-0 flex-col items-center">
+        <VStack className="flex-1 items-center z-10">
+          <VStack className="bg-Auto p-5 pb-0 flex-col items-center">
             {/* ----------------------------------- Sign Up ------------------------------------------ */}
             <FormControl className=" w-80" isInvalid={!!errors?.email}>
               <FormControlLabel>
@@ -301,35 +305,38 @@ const SignUp = () => {
             {/* ----------------------------------- Sign Up Button ------------------------------------------ */}
             <VStack className="w-80 my-5">
               <Button
+                isDisabled={isLoading}
                 className="w-full h-12 bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
                 onPress={handleSubmit(onSubmit)}
               >
-                <ButtonText className="font-medium">Sign up</ButtonText>
+                <ButtonText className="font-medium">
+                  {isLoading ? "Loading..." : "Sign up"}
+                </ButtonText>
               </Button>
             </VStack>
           </VStack>
         </VStack>
-        <VStack className="flex-1 justify-center items-center ">
-          <VStack className="flex-1 justify-center items-center">
-            <Text size="md">Already have an account?</Text>
-            <Button
-              className="bg-IndianRed w-52 data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
-              size="md"
-              onPress={() => router.push("/auth/signin")}
-            >
-              <ButtonText>Sign In</ButtonText>
-            </Button>
-          </VStack>
-        </VStack>
-        <Center className="">
-          <Text size="2xs" className="text-primary-100">
-            Powered By
-          </Text>
-          <Text size="2xs" className="text-primary-100">
-            Sanux Technologies
-          </Text>
-        </Center>
       </VStack>
+      <VStack className="flex-1 justify-center items-center">
+        <VStack className="justify-center items-center gap-2">
+          <Text size="md">Already have an account?</Text>
+          <Button
+            className="bg-IndianRed w-52 data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
+            size="md"
+            onPress={() => router.push("/auth/signin")}
+          >
+            <ButtonText>Sign In</ButtonText>
+          </Button>
+        </VStack>
+      </VStack>
+      <Center className="">
+        <Text size="2xs" className="text-primary-100">
+          Powered By
+        </Text>
+        <Text size="2xs" className="text-primary-100">
+          Sanux Technologies
+        </Text>
+      </Center>
       {showVerifyEmailModal && (
         <VerifyCodeModal
           email={getValues("email")}

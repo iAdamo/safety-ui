@@ -268,7 +268,9 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
           <Divider className="my-4" />
 
           {/* Image */}
-          <Card className="rounded-lg border border-outline-300 mt-2">
+          <Card
+          variant="elevated"
+           className="rounded-lg border-0 shadow-lg mt-2">
             <MediaPicker onMediaSelect={handleMediaSelect} />
           </Card>
         </ModalBody>
