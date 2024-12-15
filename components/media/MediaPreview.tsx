@@ -1,9 +1,19 @@
 import { Image } from "expo-image";
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import { StyleSheet } from "react-native";
 import { VideoPlayer } from "./VideoScreen";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  HStack,
+  Button,
+  ButtonIcon,
+  Modal as Modals,
+  ModalBackdrop,
+} from "@/components/ui";
+import {
+  X as CloseIcon,
+  ArrowBigRight
+} from "lucide-react-native";
 
 interface MediaPreviewModalProps {
   isOpen: boolean;
@@ -26,84 +36,70 @@ export const MediaPreview = (props: MediaPreviewModalProps) => {
   };
 
   const saveMedia = async (uri: string, mediaType: "image" | "video") => {
-   try {
-     const hasPermission = await mediaPermission();
-     if (!hasPermission) {
-       return;
-     }
+    try {
+      const hasPermission = await mediaPermission();
+      if (!hasPermission) {
+        return;
+      }
 
-     const albumName =
-       mediaType === "image" ? "SafetyPro/Images" : "SafetyPro/Videos";
+      const albumName =
+        mediaType === "image" ? "SafetyPro/Images" : "SafetyPro/Videos";
 
-     const asset = await MediaLibrary.createAssetAsync(uri);
+      const asset = await MediaLibrary.createAssetAsync(uri);
 
-     let album = await MediaLibrary.getAlbumAsync(albumName);
-     if (!album) {
-       album = await MediaLibrary.createAlbumAsync(albumName, asset, false);
-     } else {
-       await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-     }
+      let album = await MediaLibrary.getAlbumAsync(albumName);
+      if (!album) {
+        album = await MediaLibrary.createAlbumAsync(albumName, asset, false);
+      } else {
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+      }
 
-     return asset.uri;
-   } catch (error) {
-     console.error("Error saving media:", error);
-   }
+      return asset.uri;
+    } catch (error) {
+      console.error("Error saving media:", error);
+    }
   };
 
   return (
-    <Modal visible={isOpen} animationType="slide" transparent={false}>
-      <View style={styles.modalView}>
-        {/* Close Icon */}
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Ionicons name="close" size={24} color="black" />
-        </TouchableOpacity>
+    <Modals
+      isOpen={isOpen}
+      onClose={() => onClose()}
+      isKeyboardDismissable={false}
+      closeOnOverlayClick={false}
+      avoidKeyboard={true}
+      className="bg-black"
+    >
+      <ModalBackdrop />
+      {/* Media Content */}
+      {mediaType === "image" ? (
+        <Image source={{ uri: source }} style={styles.media} />
+      ) : (
+        <VideoPlayer source={source} />
+      )}
+      <HStack className="absolute bottom-20 left-5 right-5 justify-between">
+        <Button
+          onPress={onClose}
+          className="bg-IndianRed w-12 h-12 data-[hover=true]:bg-transparent data-[active=true]:bg-transparent"
+        >
+          <ButtonIcon as={CloseIcon} className="w-10 h-10" />
+        </Button>
 
-        {/* Media Content */}
-        {mediaType === "image" ? (
-          <Image source={{ uri: source }} style={styles.media} />
-        ) : (
-          <VideoPlayer source={source} />
-        )}
-
-        {/* Save Media Button */}
-        <TouchableOpacity
-          style={styles.saveButton}
+        <Button
           onPress={() => {
             onNext(), saveMedia(source, mediaType);
           }}
+          className="w-12 h-12 bg-Teal data-[hover=true]:bg-transparent data-[active=true]:bg-transparent"
         >
-          <Ionicons name="arrow-down-circle" size={32} color="white" />
-        </TouchableOpacity>
-      </View>
-    </Modal>
+          <ButtonIcon as={ArrowBigRight} className="w-10 h-10" />
+        </Button>
+      </HStack>
+    </Modals>
   );
 };
 
 const styles = StyleSheet.create({
-  modalView: {
-    flex: 1,
-    backgroundColor: "black",
-  },
-  closeButton: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    zIndex: 10,
-    padding: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    borderRadius: 20,
-  },
-  saveButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    zIndex: 10,
-    backgroundColor: "#2196F3",
-    borderRadius: 30,
-    padding: 10,
-  },
   media: {
     flex: 1,
-    resizeMode: "contain",
+    width: "100%"
   },
 });

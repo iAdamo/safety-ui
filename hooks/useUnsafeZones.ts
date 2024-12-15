@@ -26,7 +26,7 @@ export function useUnsafeZones() {
         console.error("Error fetching unsafe zones:", error);
       }
     }
-  }, [userData.id, location, setUnsafeZones]);
+  }, [userData?.id, location, setUnsafeZones]);
 
   useEffect(() => {
     fetchUnsafeZones();
