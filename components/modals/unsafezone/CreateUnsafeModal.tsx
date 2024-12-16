@@ -50,7 +50,7 @@ import {
 } from "@/components/forms/schemas/UnsafeZoneSchema";
 import { IUnsafeZoneRequest } from "@/components/componentTypes";
 import { useSession } from "@/context/AuthContext";
-import { useUnsafeZones } from "@/hooks/useUnsafeZones";
+import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
 
 interface CreateUnsafeZoneModalProps {
   isOpen: boolean;
@@ -80,7 +80,7 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
   });
   const [loading, setLoading] = useState(false);
   const { userData } = useSession();
-  const { fetchUnsafeZones } = useUnsafeZones();
+  const { fetchUnsafeZones } = useLocationAndUnsafeZones();
 
   const handleKeyPress = () => {
     Keyboard.dismiss();

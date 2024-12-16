@@ -3,12 +3,12 @@ import { StatusBar } from "react-native";
 import { ScrollView, TouchableOpacity, RefreshControl } from "react-native";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
-import { useUnsafeZones } from "@/hooks/useUnsafeZones";
-import useLocation from "@/hooks/useLocation";
+import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
 import { useRouter } from "expo-router";
 import { useSignOut } from "@/hooks/useSignOut";
 import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
+import Loader from "@/components/loader";
 import {
   PlusIcon,
   MapPinIcon,
@@ -37,9 +37,16 @@ const Feeds = () => {
   const [modalVisible, setModalVisible] = useState<{ [key: string]: boolean }>(
     {}
   );
-  const { unsafeZones, loading, fetchUnsafeZones } = useUnsafeZones();
-  const { location, locationError, requestLocationPermission, resetError } =
-    useLocation();
+  const {
+    unsafeZones,
+    loadingZone,
+    fetchUnsafeZones,
+    location,
+    loadingLocation,
+    locationError,
+    requestLocationPermission,
+    resetError,
+  } = useLocationAndUnsafeZones();
   const [showLocationError, setShowLocationError] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -47,6 +54,12 @@ const Feeds = () => {
   useEffect(() => {
     fetchUnsafeZones();
   }, [fetchUnsafeZones]);
+
+  useEffect(() => {
+    if (locationError) {
+      setShowLocationError(true);
+    }
+  }, [locationError]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -57,17 +70,8 @@ const Feeds = () => {
   const signOut = useSignOut();
   const router = useRouter();
 
-  if (loading) {
-    return (
-      <VStack className="flex-1 justify-center items-center">
-        <Text>Loading...</Text>
-      </VStack>
-    );
-  }
-
-  // Show location error modal
-  if (locationError) {
-    setShowLocationError(true);
+  if (loadingLocation || loadingZone) {
+    return <Loader />;
   }
 
   const handleCardPress = (_id: string) => {
@@ -101,10 +105,7 @@ const Feeds = () => {
                   key={feed._id}
                   onPress={() => handleCardPress(feed._id)}
                 >
-                  <Card
-                    variant="elevated"
-                    className={`mb-3 shadow-lg`}
-                  >
+                  <Card variant="elevated" className={`mb-3 shadow-lg`}>
                     <Divider
                       className={`mb-2 h-1 mx-56 -mt-3 ${
                         feed?.severityLevel === "high"

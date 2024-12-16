@@ -1,31 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle } from "react-native-maps";
-import useLocation from "@/hooks/useLocation";
 import { useSession } from "@/context/AuthContext";
 import { Box, VStack, Text, Button, ButtonText } from "@/components/ui";
 import { StyleSheet } from "react-native";
 import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
-
+import Loader from "@/components/loader";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
-import { useUnsafeZones } from "@/hooks/useUnsafeZones";
+import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
 
 const MapScreen = () => {
-  const {
-    location,
-    locationError,
-    resetError,
-    loading,
-    requestLocationPermission,
-  } = useLocation();
   const [showLocationError, setShowLocationError] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedZone, setSelectedZone] = useState<any | null>(null);
   const mapRef = useRef<MapView>(null);
   const { userData } = useSession();
-  const { unsafeZones, fetchUnsafeZones } = useUnsafeZones();
+  const {
+    unsafeZones,
+    fetchUnsafeZones,
+    location,
+    locationError,
+    resetError,
+    loadingLocation,
+    requestLocationPermission,
+  } = useLocationAndUnsafeZones();
 
   if (!location) {
     if (locationError) {
@@ -45,12 +45,8 @@ const MapScreen = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <VStack className="flex-1 justify-center items-center">
-        <Text>Loading...</Text>
-      </VStack>
-    );
+  if (loadingLocation) {
+    return ( <Loader />);
   }
 
   return (

@@ -1,16 +1,7 @@
-import React, { useEffect } from "react";
 import { Text, Center, VStack } from "@/components/ui";
-import { router } from "expo-router";
 import { StatusBar } from "react-native";
 
-const Index = () => {
-  // set timeout and push to login screen
-  useEffect(() => {
-    setTimeout(() => {
-      router.replace("auth/signin" as any);
-    }, 1000);
-  }, []);
-
+const Loader = () => {
   return (
     <Center className="flex-1 bg-IndianRed">
       <StatusBar
@@ -38,4 +29,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Loader;
