@@ -280,7 +280,6 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
             className="rounded-lg border-0 shadow-lg mt-2"
           >
             <MediaPicker onMediaSelect={handleMediaSelect} />
-
           </Card>
         </ModalBody>
         <ModalFooter className="right-8">

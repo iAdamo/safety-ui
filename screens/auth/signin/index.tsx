@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { StatusBar } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,7 +47,6 @@ type ControllerRenderType = {
 
 const Login = () => {
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { login } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -82,16 +81,16 @@ const Login = () => {
       setIsLoading(false);
     } catch (error) {
       setValidated({ emailValid: false, passwordValid: false });
-      setErrorMessage(
-        (error as any).response?.data?.message || "An unexpected error occurred"
-      );
       toast.show({
         placement: "top",
         duration: 5000,
-        render: ({ id }) => {
+        render: ({ id }: { id: string }) => {
           return (
             <Toast nativeID={id} variant="outline" action="error">
-              <ToastTitle>{errorMessage}</ToastTitle>
+              <ToastTitle>
+                {(error as any).response?.data?.message ||
+                  "An unexpected error occurred"}
+              </ToastTitle>
             </Toast>
           );
         },
@@ -119,13 +118,10 @@ const Login = () => {
 
   return (
     <Box className="flex-1">
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={"#CD5C5C"}
-      />
-
-      <SafeAreaView className="h-48 bg-IndianRed"></SafeAreaView>
-      <VStack className="flex max-w-full pt-14 flex-col items-center">
+      <SafeAreaView className="md:hidden flex h-48 bg-IndianRed"></SafeAreaView>
+      <Box className="hidden md:flex md:flex-col md:w-1/4 md:h-full md:bg-IndianRed md:fixed md:left-0 z-20"></Box>
+      <StatusBar style="auto" backgroundColor={"#CD5C5C"} />
+      <VStack className="flex max-w-full pt-14 flex-col items-center md:pt-20 md:ml-80 md:mt-20">
         <VStack className="flex p-5 mx-5 mb-5 flex-col items-center gap-6">
           <FormControl
             className=" w-80"
@@ -164,8 +160,7 @@ const Login = () => {
             <FormControlError>
               <FormControlErrorIcon as={AlertTriangle} />
               <FormControlErrorText>
-                {errors?.email?.message ||
-                  (!validated.emailValid && errorMessage)}
+                {errors?.email?.message || !validated.emailValid}
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
@@ -211,8 +206,7 @@ const Login = () => {
             <FormControlError>
               <FormControlErrorIcon as={AlertTriangle} />
               <FormControlErrorText>
-                {errors?.password?.message ||
-                  (!validated.passwordValid && errorMessage)}
+                {errors?.password?.message || !validated.passwordValid}
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
@@ -236,7 +230,7 @@ const Login = () => {
           </HStack>
         </VStack>
       </VStack>
-      <VStack className="flex-1 justify-center items-center">
+      <VStack className="flex-1 justify-center items-center md:ml-80">
         <Text size="md">Don't have an account?</Text>
         <Button
           className="bg-Teal w-52 data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
@@ -246,7 +240,7 @@ const Login = () => {
           <ButtonText>Create New Account</ButtonText>
         </Button>
       </VStack>
-      <Center className="">
+      <Center className="md:ml-80">
         <Text size="2xs" className="text-primary-100">
           Powered By
         </Text>

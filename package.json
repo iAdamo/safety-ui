@@ -19,7 +19,7 @@
   "dependencies": {
     "@expo/html-elements": "^0.4.2",
     "@expo/ngrok": "^4.1.3",
-    "@expo/vector-icons": "^14.0.2",
+    "@expo/vector-icons": "^14.0.4",
     "@gluestack-ui/alert": "^0.1.16",
     "@gluestack-ui/alert-dialog": "^0.1.32",
     "@gluestack-ui/button": "^1.0.8",

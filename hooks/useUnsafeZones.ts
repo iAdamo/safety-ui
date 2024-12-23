@@ -83,6 +83,7 @@ export function useLocationAndUnsafeZones() {
 
   const fetchUnsafeZones = useCallback(async () => {
     if (userData.id && location) {
+      setLoadingLocation(true);
       try {
         const response = await getUnsafeZone(userData.id, {
           userLat: location.latitude,
@@ -91,6 +92,7 @@ export function useLocationAndUnsafeZones() {
         });
         if (response) {
           setUnsafeZones(response);
+          setLoadingLocation(false);
         }
       } catch (error) {
         console.error("Error fetching unsafe zones:", error);

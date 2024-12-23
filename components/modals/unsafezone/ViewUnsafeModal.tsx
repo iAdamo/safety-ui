@@ -1,27 +1,25 @@
-import * as React from "react";
+import React from "react";
+import { Platform, ScrollView } from "react-native";
 import PagerView from "react-native-pager-view";
 import { Image } from "expo-image";
 import { VideoPlayer } from "@/components/media/VideoScreen";
 import {
   Box,
-  HStack,
   VStack,
   Heading,
   Text,
   Button,
   ButtonText,
-  Icon,
   Modal,
   ModalBackdrop,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
-  ModalCloseButton,
   Card,
   Divider,
 } from "@/components/ui";
-import { CircleIcon, X as CloseIcon } from "lucide-react-native";
+
 import { IUnsafeZoneResponse } from "@/components/componentTypes";
 
 interface ViewUnsafeModalProps {
@@ -29,6 +27,32 @@ interface ViewUnsafeModalProps {
   onClose: () => void;
   zone?: IUnsafeZoneResponse;
 }
+
+// Cross-platform PagerView Component
+const CrossPlatformPagerView = ({
+  children,
+  style,
+}: {
+  children: React.ReactNode[];
+  style?: object;
+}) => {
+  if (Platform.OS === "web") {
+    return (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={style}
+      >
+        {children.map((child, index) => (
+          <Box key={index} style={{ width: "100%" }}>
+            {child}
+          </Box>
+        ))}
+      </ScrollView>
+    );
+  }
+  return <PagerView style={style}>{children}</PagerView>;
+};
 
 export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
   const { isOpen, onClose, zone } = props;
@@ -124,9 +148,9 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
 
           <Card className="rounded-lg border border-outline-300 mt-2 ">
             {availableContent.length > 0 ? (
-              <PagerView style={{ height: 320 }} initialPage={0}>
+              <CrossPlatformPagerView style={{ height: 320 }}>
                 {availableContent}
-              </PagerView>
+              </CrossPlatformPagerView>
             ) : (
               <Box className="h-60 justify-center items-center">
                 <Text>No content available</Text>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { StatusBar } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { ScrollView, TouchableOpacity, RefreshControl } from "react-native";
 import { closeApp } from "@/utils/CloseApp";
 import { AlertModal } from "@/components/modals/Alert/AlertModal";
@@ -84,7 +84,7 @@ const Feeds = () => {
 
   return (
     <Box className="flex-1">
-      <StatusBar barStyle="dark-content" backgroundColor={"#4682B4"} />
+      <StatusBar style="dark" backgroundColor={"#4682B4"} />
       <SafeAreaView className="h-40 bg-SteelBlue border-0 shadow-hard-5-indianred"></SafeAreaView>
       <VStack className="flex-1 px-5 pb-16">
         <VStack className="h-full p-3">
