@@ -136,7 +136,7 @@ const SignUp = () => {
     <Box className="flex-1">
       <SafeAreaView className="md:hidden flex h-48 bg-Teal"></SafeAreaView>
       <Box className="hidden md:flex md:flex-col md:w-1/4 md:h-full md:bg-Teal md:fixed md:left-0 z-20"></Box>
-      <StatusBar style="auto" backgroundColor={"#008080"} />
+      <StatusBar style="auto" translucent={false} backgroundColor={"#008080"} />
       <VStack className="flex-1 md:flex-none flex-col max-w-full pt-5 md:pt-20 md:ml-80">
         <VStack className="bg-Auto p-5 pb-0 flex-col items-center z-10">
           {/* ----------------------------------- Sign Up ------------------------------------------ */}

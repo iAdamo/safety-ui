@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Platform } from "react-native";
 import * as Location from "expo-location";
 import { useStorageState } from "@/utils/UseStorageState";
-import { getUnsafeZone } from "@/api/unsafeZoneHelper";
+import { getUnsafeZone, getUserUnsafeZones } from "@/api/unsafeZoneHelper";
 import { IUnsafeZoneResponse } from "@/components/componentTypes";
 import { useSession } from "@/context/AuthContext";
 
@@ -18,6 +18,8 @@ export function useLocationAndUnsafeZones() {
   const [loadingLocation, setLoadingLocation] = useState(true);
   const [[loadingZone, unsafeZones], setUnsafeZones] =
     useStorageState<IUnsafeZoneResponse[]>("unsafeZones");
+  const [[loading, userUnsafeZones], setUserUnsafeZones] =
+    useStorageState<IUnsafeZoneResponse[]>("userUnsafeZones");
 
   const requestLocationPermission = async () => {
     setLoadingLocation(true);
@@ -81,6 +83,19 @@ export function useLocationAndUnsafeZones() {
     }
   };
 
+  const fetchUserUnsafeZones = useCallback(async () => {
+    if (userData.id) {
+      try {
+        const response = await getUserUnsafeZones(userData.id);
+        if (response) {
+          setUserUnsafeZones(response);
+        }
+      } catch (error) {
+        console.error("Error fetching user unsafe zones:", error);
+      }
+    }
+  }, [userData?.id, setUnsafeZones]);
+
   const fetchUnsafeZones = useCallback(async () => {
     if (userData.id && location) {
       setLoadingLocation(true);
@@ -107,8 +122,8 @@ export function useLocationAndUnsafeZones() {
   useEffect(() => {
     if (location) {
       fetchUnsafeZones();
-      const intervalId = setInterval(fetchUnsafeZones, 300000);
-      return () => clearInterval(intervalId);
+      // const intervalId = setInterval(fetchUnsafeZones, 300000);
+      // return () => clearInterval(intervalId);
     }
   }, [location, fetchUnsafeZones]);
 
@@ -119,8 +134,10 @@ export function useLocationAndUnsafeZones() {
     locationError,
     loadingLocation,
     unsafeZones,
+    userUnsafeZones,
     loadingZone,
     fetchUnsafeZones,
+    fetchUserUnsafeZones,
     requestLocationPermission,
     resetError,
   };

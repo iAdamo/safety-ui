@@ -120,7 +120,7 @@ const Login = () => {
     <Box className="flex-1">
       <SafeAreaView className="md:hidden flex h-48 bg-IndianRed"></SafeAreaView>
       <Box className="hidden md:flex md:flex-col md:w-1/4 md:h-full md:bg-IndianRed md:fixed md:left-0 z-20"></Box>
-      <StatusBar style="auto" backgroundColor={"#CD5C5C"} />
+      <StatusBar style="auto" translucent={false} backgroundColor={"#CD5C5C"} />
       <VStack className="flex max-w-full pt-14 flex-col items-center md:pt-20 md:ml-80 md:mt-20">
         <VStack className="flex p-5 mx-5 mb-5 flex-col items-center gap-6">
           <FormControl

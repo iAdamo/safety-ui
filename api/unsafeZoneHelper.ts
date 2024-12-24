@@ -36,6 +36,16 @@ export const updateUnsafeZone = async (id: string, data: UpdateUnsafeZone) => {
   }
 };
 
+export const getUserUnsafeZones = async (id: string) => {
+  try {
+    const response = await unsafeAxios.get(`user/${id}/`);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
 interface GetUnsafeZone {
   userLat: number;
   userLong: number;
