@@ -39,7 +39,6 @@ import {
 } from "@/components/ui";
 import { Keyboard } from "react-native";
 import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle, CircleIcon, X as CloseIcon } from "lucide-react-native";
 import { MediaPicker } from "@/components/media/MediaPicker";

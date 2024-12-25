@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
 import { useRouter } from "expo-router";
 import { useSignOut } from "@/hooks/useSignOut";
-import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
+import { CreateUnsafeModal } from "@/components/CreateUnsafeModal";
 import Loader from "@/components/loader";
 import {
   PlusIcon,
@@ -24,10 +24,7 @@ import {
 } from "@/components/ui";
 
 export const RightFeeds = ({ myUnsafeZone }: any) => {
-  const {
-    fetchUserUnsafeZones,
-    location,
-  } = useLocationAndUnsafeZones();
+  const { fetchUserUnsafeZones, location } = useLocationAndUnsafeZones();
   const [showEditModal, setShowEditModal] = useState(false);
 
   const signOut = useSignOut();
@@ -52,7 +49,7 @@ export const RightFeeds = ({ myUnsafeZone }: any) => {
         </Box>
         <Box>
           <Fab
-            className="w-16 h-16 rounded-full bg-Khaki data-[hover=true]:bg-Khaki-600 data-[active=true]:bg-Khaki-700 shadow-hard-5"
+            className="w-16 h-16 rounded-full bg-yellow-500 data-[hover=true]:bg-yellow-200 data-[active=true]:bg-yellow-300 shadow-hard-5"
             placement="bottom right"
             onPress={() => router.push("/dashboard/map")}
           >

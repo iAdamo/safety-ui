@@ -26,3 +26,4 @@ export * from "./radio";
 export * from "./divider";
 export * from "./fab";
 export * from "./pressable";
+export * from "./popover";
