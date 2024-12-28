@@ -29,7 +29,7 @@ export async function setStorageItemAsync(key: string, value: string | null) {
       console.error("Local storage is unavailable:", e);
     }
   } else {
-    if (key === "unsafeZones") {
+    if (key === "unsafeZones" || key === "userUnsafeZones") {
       if (value == null) {
         await AsyncStorage.removeItem(key);
       } else {
@@ -61,7 +61,7 @@ export function useStorageState<T>(key: string): UseStateHook<T> {
         }
       } else {
         let value;
-        if (key === "unsafeZones") {
+        if (key === "unsafeZones" || key === "userUnsafeZones") {
           value = await AsyncStorage.getItem(key);
         } else {
           value = await SecureStore.getItemAsync(key);

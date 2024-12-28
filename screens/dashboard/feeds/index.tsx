@@ -6,7 +6,7 @@ import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
 import Loader from "@/components/loader";
 import MyUnsafeZone from "@/components/MyUnsafeZone";
 import { RightFeeds } from "@/components/fab/FeedsFab";
-import UnsafeZones from "@/components/modals/unsafezone/UnsafeZones";
+import UnsafeZones from "@/components/UnsafeZones";
 import {
   Box,
   VStack,

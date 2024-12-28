@@ -3,7 +3,7 @@ import MapView, { Marker, PROVIDER_GOOGLE, Circle } from "react-native-maps";
 import { useSession } from "@/context/AuthContext";
 import { Box, VStack, Text, Button, ButtonText } from "@/components/ui";
 import { StyleSheet } from "react-native";
-import { CreateUnsafeModal } from "@/components/CreateUnsafeModal";
+import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
 import Loader from "@/components/loader";
 import { closeApp } from "@/utils/CloseApp";

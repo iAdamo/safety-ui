@@ -2,8 +2,8 @@ import { useState } from "react";
 import { ScrollView, RefreshControl } from "react-native";
 import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
-import { IUnsafeZoneResponse } from "@/components/componentTypes";
 import { useStorageState } from "@/utils/UseStorageState";
+import { IUnsafeZoneResponse } from "@/components/componentTypes";
 import {
   Text,
   VStack,
@@ -18,23 +18,19 @@ import {
   PopoverBackdrop,
   PopoverContent,
 } from "@/components/ui";
-import {
-  Trash2Icon,
-  PenLineIcon,
-  BarChartBig,
-} from "lucide-react-native";
+import { Trash2Icon, PenLineIcon, BarChartBig } from "lucide-react-native";
 
-function MyUnsafeZone() {
+function UnsafeZones() {
   const [modalVisible, setModalVisible] = useState<{ [key: string]: boolean }>(
     {}
   );
   const [popoverVisible, setPopoverVisible] = useState<{
     [key: string]: boolean;
   }>({});
-  const { fetchUserUnsafeZones } = useLocationAndUnsafeZones();
+  const { fetchUnsafeZones } = useLocationAndUnsafeZones();
   const [refreshing, setRefreshing] = useState(false);
-  const [[loading, userUnsafeZones], setUserUnsafeZones] =
-      useStorageState<IUnsafeZoneResponse[]>("userUnsafeZones");
+  const [[loadingZone, unsafeZones], setUnsafeZones] =
+    useStorageState<IUnsafeZoneResponse[]>("unsafeZones");
 
   const handleCardPress = (_id: string) => {
     setModalVisible((prev) => ({ ...prev, [_id]: true }));
@@ -51,18 +47,20 @@ function MyUnsafeZone() {
   const handleClosePopover = (_id: string) => {
     setPopoverVisible((prev) => ({ ...prev, [_id]: false }));
   };
+
+
   const handleSoftDelete = (_id: string) => {
-    const updatedZones = userUnsafeZones?.map((zone: IUnsafeZoneResponse) =>
+    const updatedZones = unsafeZones?.map((zone: IUnsafeZoneResponse) =>
       zone._id === _id ? { ...zone, deleted: true } : zone
     );
-    setUserUnsafeZones(updatedZones ?? null);
+    setUnsafeZones(updatedZones ?? null);
 
     handleClosePopover(_id);
-  };
+  }
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchUserUnsafeZones();
+    fetchUnsafeZones();
     setRefreshing(false);
   };
 
@@ -79,8 +77,8 @@ function MyUnsafeZone() {
           />
         }
       >
-        {userUnsafeZones &&
-          userUnsafeZones
+        {unsafeZones &&
+          unsafeZones
             .filter((zone) => !zone.deleted)
             .map((feed) => (
               <Popover
@@ -153,4 +151,4 @@ function MyUnsafeZone() {
   );
 }
 
-export default MyUnsafeZone;
+export default UnsafeZones;

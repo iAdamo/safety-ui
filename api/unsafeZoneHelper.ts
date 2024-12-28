@@ -61,3 +61,13 @@ export const getUnsafeZone = async (id: string, data: GetUnsafeZone) => {
     throw err;
   }
 };
+
+export const deleteUnsafeZone = async (id: string) => {
+  try {
+    const response = await unsafeAxios.delete(`${id}/`);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}

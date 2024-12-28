@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
 import { useRouter } from "expo-router";
 import { useSignOut } from "@/hooks/useSignOut";
-import { CreateUnsafeModal } from "@/components/CreateUnsafeModal";
+import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
 import Loader from "@/components/loader";
 import {
   PlusIcon,

@@ -22,6 +22,7 @@ export interface IUnsafeZoneResponse {
   description: string;
   radius: number;
   severityLevel: string;
+  deleted?: boolean;
   location: {
     coordinates: [number, number];
   };
