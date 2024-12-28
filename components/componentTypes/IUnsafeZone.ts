@@ -8,11 +8,6 @@ export interface IUnsafeZoneRequest {
     type: "Point";
     coordinates: [number, number];
   };
-  image?: string;
-  audio?: string;
-  video?: string;
-  resolved: boolean;
-  active: boolean;
 }
 
 export interface IUnsafeZoneResponse {
@@ -28,9 +23,6 @@ export interface IUnsafeZoneResponse {
   };
   createdAt: string;
   updatedAt: string;
-  image?: string;
-  audio?: string;
-  video?: string;
   resolved: boolean;
   active: boolean;
 }

@@ -50,6 +50,8 @@ import {
 import { IUnsafeZoneRequest } from "@/components/componentTypes";
 import { useSession } from "@/context/AuthContext";
 import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
+import { uploadMedia } from "@/api/mediaHelper";
+import { useMediaManagement, MediaItem } from "@/hooks/useMediaManagement";
 
 interface CreateUnsafeZoneModalProps {
   isOpen: boolean;
@@ -78,16 +80,18 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
     },
   });
   const [loading, setLoading] = useState(false);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+
   const { userData } = useSession();
   const { fetchUnsafeZones } = useLocationAndUnsafeZones();
+
+  const handleMediaSelect = (selectedMedia: MediaItem[]) => {
+    setMediaItems(selectedMedia);
+  };
 
   const handleKeyPress = () => {
     Keyboard.dismiss();
     handleSubmit(onSubmit)();
-  };
-
-  const handleMediaSelect = (type: "image" | "video", uri: string) => {
-    setValue(type, uri);
   };
 
   const onSubmit = async (data: UnsafeZoneSchemaType) => {
@@ -99,10 +103,8 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
         radius,
         severityLevel,
         // tags,
-        image,
-        video,
-        audio,
       } = data;
+
       const unsafeZoneData: IUnsafeZoneRequest = {
         markedBy: userData.id,
         location: {
@@ -114,16 +116,17 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
         title: title.toUpperCase(),
         description: description.trim(),
         // tags,
-        image,
-        video,
-        audio,
-        resolved: false,
-        active: true,
       };
+
       const response = await createUnsafeZone(unsafeZoneData);
-      if (response) {
-        fetchUnsafeZones(); // Fetch updated unsafe zones
+      if (response && mediaItems.length > 0) {
+        const mediaResponse = await uploadMedia(
+          mediaItems,
+          userData.id,
+          response._id
+        );
       }
+      await fetchUnsafeZones();
     } catch (error) {
       console.error("Error creating unsafe zone:", error);
     } finally {
@@ -278,6 +281,7 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
             variant="elevated"
             className="rounded-lg border-0 shadow-lg mt-2"
           >
+            {/** Select media files */}
             <MediaPicker onMediaSelect={handleMediaSelect} />
           </Card>
         </ModalBody>

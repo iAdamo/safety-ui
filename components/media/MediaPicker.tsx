@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { MediaPreview } from "./MediaPreview";
 import { Image } from "expo-image";
@@ -33,7 +33,7 @@ import { useMediaManagement, MediaItem } from "@/hooks/useMediaManagement";
 import { CameraControls } from "@/components/media/CameraControls";
 
 interface MediaPickerProps {
-  onMediaSelect: (type: "image" | "video", uri: string) => void;
+  onMediaSelect: (mediaItem: MediaItem[]) => void;
 }
 
 export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
@@ -47,13 +47,11 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
     imagePickerPermission,
   } = usePermissions();
 
-  const {
-    mediaItems,
-    addMediaItem,
-    removeMediaItem,
-    openGallery,
-  } = useMediaManagement();
-
+  const { mediaItems, addMediaItem, removeMediaItem, openGallery } =
+    useMediaManagement();
+  useEffect(() => {
+    onMediaSelect(mediaItems);
+  }, [mediaItems]);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -110,7 +108,6 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
         uri: image.uri,
       };
       addMediaItem(newMediaItem);
-      onMediaSelect("image", image.uri);
       camera.pausePreview();
       setShowPreview(true);
     }
@@ -128,7 +125,6 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
         uri: video.uri,
       };
       addMediaItem(newMediaItem);
-      onMediaSelect("video", video.uri);
       setIsRecording(false);
       camera.pausePreview();
       setShowPreview(true);
@@ -233,12 +229,12 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
           active={isCameraOpen}
         />
         {/** Close and flashlight buttons */}
-          <Button
-            onPress={() => handleCameraClose()}
-            className="rounded-full bg-primary-950/20 w-14 h-14 absolute top-5 left-5"
-          >
-            <ButtonIcon as={CloseIcon} size="xl" className="" />
-          </Button>
+        <Button
+          onPress={() => handleCameraClose()}
+          className="rounded-full bg-primary-950/20 w-14 h-14 absolute top-5 left-5"
+        >
+          <ButtonIcon as={CloseIcon} size="xl" className="" />
+        </Button>
 
         <CameraControls
           mode={mode}
