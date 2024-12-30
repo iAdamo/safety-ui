@@ -20,11 +20,11 @@ export const uploadMedia = async (
 
   mediaItems.forEach((item, index) => {
     const fileType = item.type === "image" ? "image/jpeg" : "video/mp4";
-    const fileName = item.type === "image" ? `image${index}_${unsafeZoneId}.jpg` : `video${index}_${unsafeZoneId}.mp4`;
+    // const fileName = item.type === "image" ? `image${index}_${unsafeZoneId}.jpg` : `video${index}_${unsafeZoneId}.mp4`;
 
     data.append("media", {
       uri: item.uri,
-      name: fileName,
+      name: item.uri.split("/").pop(),
       type: fileType,
     } as any);
   });

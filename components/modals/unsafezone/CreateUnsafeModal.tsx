@@ -81,6 +81,7 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
   });
   const [loading, setLoading] = useState(false);
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const { saveMedia } = useMediaManagement();
 
   const { userData } = useSession();
   const { fetchUnsafeZones } = useLocationAndUnsafeZones();
@@ -125,6 +126,10 @@ export const CreateUnsafeModal: React.FC<CreateUnsafeZoneModalProps> = ({
           userData.id,
           response._id
         );
+        if (mediaResponse) {
+          await saveMedia(mediaItems, response._id);
+        }
+
       }
       await fetchUnsafeZones();
     } catch (error) {

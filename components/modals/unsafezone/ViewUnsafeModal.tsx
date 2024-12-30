@@ -1,26 +1,30 @@
-import React from "react";
-import { Platform, ScrollView } from "react-native";
+import { useState, useEffect } from "react";
 import PagerView from "react-native-pager-view";
 import { Image } from "expo-image";
 import { VideoPlayer } from "@/components/media/VideoScreen";
 import {
   Box,
+  HStack,
   VStack,
   Heading,
   Text,
   Button,
   ButtonText,
+  Icon,
   Modal,
   ModalBackdrop,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
+  ModalCloseButton,
   Card,
   Divider,
 } from "@/components/ui";
-
+import { CircleIcon, X as CloseIcon } from "lucide-react-native";
 import { IUnsafeZoneResponse } from "@/components/componentTypes";
+import { useMediaManagement, MediaItem } from "@/hooks/useMediaManagement";
+import { useSession } from "@/context/AuthContext";
 
 interface ViewUnsafeModalProps {
   isOpen: boolean;
@@ -28,35 +32,24 @@ interface ViewUnsafeModalProps {
   zone?: IUnsafeZoneResponse;
 }
 
-// Cross-platform PagerView Component
-const CrossPlatformPagerView = ({
-  children,
-  style,
-}: {
-  children: React.ReactNode[];
-  style?: object;
-}) => {
-  if (Platform.OS === "web") {
-    return (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={style}
-      >
-        {children.map((child, index) => (
-          <Box key={index} style={{ width: "100%" }}>
-            {child}
-          </Box>
-        ))}
-      </ScrollView>
-    );
-  }
-  return <PagerView style={style}>{children}</PagerView>;
-};
+// ...existing code...
 
 export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
   const { isOpen, onClose, zone } = props;
+  const { userData } = useSession();
+  const { setZoneId, getZoneMedia } = useMediaManagement();
+  const [zoneMedia, setZoneMedia] = useState<MediaItem[]>([]);
 
+  useEffect(() => {
+    if (zone) {
+      setZoneId(zone._id);
+      getZoneMedia().then((media) => {
+        if (media) {
+          setZoneMedia(media);
+        }
+      });
+    }
+  }, [isOpen]);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
@@ -67,36 +60,35 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
   const isSameDate =
     createdAt && updatedAt && createdAt.getTime() === updatedAt.getTime();
 
-  const availableContent = [];
-
-  if (zone?.image) {
-    availableContent.push(
-      <Box key="image" className="flex-1 items-center justify-center">
-        <Image
-          source={{ uri: zone.image }}
-          style={{ flex: 1, width: "100%", height: "100%" }}
-        />
-        <Text>Swipe ➡️</Text>
-      </Box>
-    );
-  }
-
-  if (zone?.audio) {
-    availableContent.push(
-      <Box key="audio" className="flex-1 justify-center items-center">
-        <Text>Coming Soon</Text>
-      </Box>
-    );
-  }
-
-  if (zone?.video) {
-    availableContent.push(
-      <Box key="video" className="flex-1 justify-center items-center">
-        <VideoPlayer source={zone.video} />
-        <Text>Swipe ➡️</Text>
-      </Box>
-    );
-  }
+  const renderMediaItem = (media: MediaItem, index: number) => {
+    switch (media.type) {
+      case "image":
+        return (
+          <Box
+            key={`image-${index}`}
+            className="flex-1 items-center justify-center"
+          >
+            <Image
+              source={{ uri: media.uri }}
+              style={{ flex: 1, width: "100%", height: "100%" }}
+            />
+            <Text>Swipe ➡️</Text>
+          </Box>
+        );
+      case "video":
+        return (
+          <Box
+            key={`video-${index}`}
+            className="flex-1 justify-center items-center"
+          >
+            <VideoPlayer source={media.uri} />
+            <Text>Swipe ➡️</Text>
+          </Box>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <Modal
@@ -147,10 +139,12 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
           </Card>
 
           <Card className="rounded-lg border border-outline-300 mt-2 ">
-            {availableContent.length > 0 ? (
-              <CrossPlatformPagerView style={{ height: 320 }}>
-                {availableContent}
-              </CrossPlatformPagerView>
+            {zoneMedia.length > 0 ? (
+              <PagerView style={{ height: 320 }} initialPage={0}>
+                {zoneMedia?.map((media, index) =>
+                  renderMediaItem(media, index)
+                )}
+              </PagerView>
             ) : (
               <Box className="h-60 justify-center items-center">
                 <Text>No content available</Text>

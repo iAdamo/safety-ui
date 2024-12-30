@@ -1,8 +1,6 @@
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 import { VideoPlayer } from "./VideoScreen";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
 import {
   HStack,
   Button,
@@ -25,40 +23,6 @@ interface MediaPreviewModalProps {
 
 export const MediaPreview = (props: MediaPreviewModalProps) => {
   const { isOpen, onClose, mediaType, source, onNext } = props;
-
-  const mediaPermission = async () => {
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== "granted") {
-      alert("Permission to access media is required!");
-      return false;
-    }
-    return true;
-  };
-
-  const saveMedia = async (uri: string, mediaType: "image" | "video") => {
-    try {
-      const hasPermission = await mediaPermission();
-      if (!hasPermission) {
-        return;
-      }
-
-      const albumName =
-        mediaType === "image" ? "SafetyPro/Images" : "SafetyPro/Videos";
-
-      const asset = await MediaLibrary.createAssetAsync(uri);
-
-      let album = await MediaLibrary.getAlbumAsync(albumName);
-      if (!album) {
-        album = await MediaLibrary.createAlbumAsync(albumName, asset, false);
-      } else {
-        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-      }
-
-      return asset.uri;
-    } catch (error) {
-      console.error("Error saving media:", error);
-    }
-  };
 
   return (
     <Modals
@@ -85,9 +49,7 @@ export const MediaPreview = (props: MediaPreviewModalProps) => {
         </Button>
 
         <Button
-          onPress={() => {
-            onNext(), saveMedia(source, mediaType);
-          }}
+          onPress={() => {onNext()}}
           className="w-12 h-12 bg-Teal data-[hover=true]:bg-transparent data-[active=true]:bg-transparent"
         >
           <ButtonIcon as={ArrowBigRight} className="w-10 h-10" />
