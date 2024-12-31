@@ -1,0 +1,31 @@
+{
+  "assets": [
+    {
+      "albumId": "-746221930",
+      "creationTime": 0,
+      "duration": 0,
+      "filename": "0863cb97-0318-48fd-94ca-da591e1bae1d.jpeg",
+      "height": 1280,
+      "id": "1000428812",
+      "mediaType": "photo",
+      "modificationTime": 1735576716000,
+      "uri": "file:///storage/emulated/0/Pictures/SafetyPro/Zone-6772cc60ecd89254fd21c9a7/0863cb97-0318-48fd-94ca-da591e1bae1d.jpeg",
+      "width": 720
+    },
+    {
+      "albumId": "-746221930",
+      "creationTime": 0,
+      "duration": 0,
+      "filename": "e16ec1c4-2298-4022-aae9-bc920960ad7f.jpeg",
+      "height": 1280,
+      "id": "1000428814",
+      "mediaType": "photo",
+      "modificationTime": 1735576718000,
+      "uri": "file:///storage/emulated/0/Pictures/SafetyPro/Zone-6772cc60ecd89254fd21c9a7/e16ec1c4-2298-4022-aae9-bc920960ad7f.jpeg",
+      "width": 928
+    }
+  ],
+  "endCursor": "2",
+  "hasNextPage": false,
+  "totalCount": 2
+}

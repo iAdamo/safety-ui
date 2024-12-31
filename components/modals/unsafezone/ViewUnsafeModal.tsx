@@ -37,19 +37,18 @@ interface ViewUnsafeModalProps {
 export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
   const { isOpen, onClose, zone } = props;
   const { userData } = useSession();
-  const { setZoneId, getZoneMedia } = useMediaManagement();
+  const { getZoneMedia } = useMediaManagement();
   const [zoneMedia, setZoneMedia] = useState<MediaItem[]>([]);
 
   useEffect(() => {
-    if (zone) {
-      setZoneId(zone._id);
-      getZoneMedia().then((media) => {
+    if (isOpen && zone) {
+      getZoneMedia(zone).then((media) => {
         if (media) {
           setZoneMedia(media);
         }
       });
     }
-  }, [isOpen]);
+  }, [isOpen, zone]);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;

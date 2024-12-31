@@ -45,3 +45,13 @@ export const uploadMedia = async (
     throw err;
   }
 };
+
+export const getMedia = async (zoneId: string): Promise<{ url: string; type: "image" | "video" }[]> => {
+  try {
+    const response = await mediaAxios.get(`/${zoneId}`);
+    return response.data;
+  } catch (err) {
+    console.error("Error getting media:", err);
+    throw err;
+  }
+};
