@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScrollView, RefreshControl } from "react-native";
 import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
 import { ViewUnsafeModal } from "@/components/modals/unsafezone/ViewUnsafeModal";
@@ -36,6 +36,13 @@ function MyUnsafeZone() {
   const [[loading, userUnsafeZones], setUserUnsafeZones] =
       useStorageState<IUnsafeZoneResponse[]>("userUnsafeZones");
 
+  useEffect(() => {
+    const fetchZones = async () => {
+      await fetchUserUnsafeZones();
+    };
+    fetchZones();
+  }, []); // Empty dependency array ensures this runs only once
+
   const handleCardPress = (_id: string) => {
     setModalVisible((prev) => ({ ...prev, [_id]: true }));
   };
@@ -60,9 +67,9 @@ function MyUnsafeZone() {
     handleClosePopover(_id);
   };
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    fetchUserUnsafeZones();
+    await fetchUserUnsafeZones();
     setRefreshing(false);
   };
 

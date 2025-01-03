@@ -83,18 +83,21 @@ export function useLocationAndUnsafeZones() {
     }
   };
 
-  const fetchUserUnsafeZones = useCallback(async () => {
+  const fetchUserUnsafeZones = async () => {
     if (userData.id) {
       try {
         const response = await getUserUnsafeZones(userData.id);
         if (response) {
+          console.log("jeelloo");
           setUserUnsafeZones(response);
         }
       } catch (error) {
         console.error("Error fetching user unsafe zones:", error);
       }
     }
-  }, [userData?.id, setUnsafeZones]);
+  };
+
+
 
   const fetchUnsafeZones = useCallback(async () => {
     if (userData.id && location) {
@@ -119,13 +122,13 @@ export function useLocationAndUnsafeZones() {
     requestLocationPermission();
   }, []);
 
-  useEffect(() => {
-    if (location) {
-      fetchUnsafeZones();
-      // const intervalId = setInterval(fetchUnsafeZones, 300000);
-      // return () => clearInterval(intervalId);
-    }
-  }, [location, fetchUnsafeZones]);
+  //useEffect(() => {
+    //if (location) {
+      // fetchUnsafeZones();
+      //const intervalId = setInterval(fetchUnsafeZones, 300000);
+      //return () => clearInterval(intervalId);
+    //}
+  //}, [location, fetchUnsafeZones]);
 
   const resetError = () => setError(null);
 

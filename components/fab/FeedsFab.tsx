@@ -24,14 +24,13 @@ import {
 } from "@/components/ui";
 
 export const RightFeeds = ({ myUnsafeZone }: any) => {
-  const { fetchUserUnsafeZones, location } = useLocationAndUnsafeZones();
+  const { location } = useLocationAndUnsafeZones();
   const [showEditModal, setShowEditModal] = useState(false);
 
   const signOut = useSignOut();
   const router = useRouter();
 
-  const toggleMyUnsafeZone = () => {
-    fetchUserUnsafeZones();
+  const toggleMyUnsafeZone = async () => {
     myUnsafeZone((prev: boolean) => !prev);
   };
 
