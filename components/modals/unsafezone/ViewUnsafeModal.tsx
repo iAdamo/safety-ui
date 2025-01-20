@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PagerView from "react-native-pager-view";
 import { Image } from "expo-image";
-import { VideoPlayer } from "@/components/media/VideoScreen";
+import { VideoScreen } from "@/components/media/VideoScreen";
 import {
   Box,
   HStack,
@@ -20,10 +20,12 @@ import {
   ModalCloseButton,
   Card,
   Divider,
+  Progress,
+  ProgressFilledTrack,
 } from "@/components/ui";
 import { CircleIcon, X as CloseIcon } from "lucide-react-native";
-import { IUnsafeZoneResponse } from "@/components/componentTypes";
-import { useMediaManagement, MediaItem } from "@/hooks/useMediaManagement";
+import { IUnsafeZoneResponse, MediaItem } from "@/components/componentTypes";
+import { useMediaManagement } from "@/hooks/useMediaManagement";
 import { useSession } from "@/context/AuthContext";
 
 interface ViewUnsafeModalProps {
@@ -32,17 +34,19 @@ interface ViewUnsafeModalProps {
   zone?: IUnsafeZoneResponse;
 }
 
-// ...existing code...
-
 export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
   const { isOpen, onClose, zone } = props;
   const { userData } = useSession();
   const { getZoneMedia } = useMediaManagement();
   const [zoneMedia, setZoneMedia] = useState<MediaItem[]>([]);
 
+  let checkMedia: boolean = false;
   useEffect(() => {
     if (isOpen && zone) {
-      getZoneMedia(zone).then((media) => {
+      if (zone.markedBy === userData.id) {
+        checkMedia = true;
+      }
+      getZoneMedia(zone, checkMedia).then((media) => {
         if (media) {
           setZoneMedia(media);
         }
@@ -78,9 +82,9 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
         return (
           <Box
             key={`video-${index}`}
-            className="flex-1 justify-center items-center"
+            className="flex-1  justify-center items-center"
           >
-            <VideoPlayer source={media.uri} />
+            <VideoScreen source={media.uri} />
             <Text>Swipe ➡️</Text>
           </Box>
         );
@@ -118,11 +122,11 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
           </VStack>
         </ModalHeader>
         <ModalBody>
-          <Card className="rounded-lg border border-outline-300 mt-2 ">
+          <Card className="rounded-lg border border-outline-300 mt-2">
             <Text>{zone?.createdAt ? formatDate(zone.createdAt) : "N/A"}</Text>
             {!isSameDate && (
               <Text>
-                Updated At:{" "}
+                Updated At:
                 {zone?.updatedAt ? formatDate(zone.updatedAt) : "N/A"}
               </Text>
             )}
@@ -137,9 +141,9 @@ export const ViewUnsafeModal = (props: ViewUnsafeModalProps) => {
             </VStack>
           </Card>
 
-          <Card className="rounded-lg border border-outline-300 mt-2 ">
+          <Card className="rounded-lg border border-outline-300 mt-2 justify-center items-center">
             {zoneMedia.length > 0 ? (
-              <PagerView style={{ height: 320 }} initialPage={0}>
+              <PagerView style={{ height: 600, width: 320 }} initialPage={0}>
                 {zoneMedia?.map((media, index) =>
                   renderMediaItem(media, index)
                 )}

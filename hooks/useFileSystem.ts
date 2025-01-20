@@ -51,7 +51,7 @@ export class MediaSystem {
     });
 
     // Log the progress to the console
-    console.log(`Download [${downloadId}] Progress: ${progress * 100}%`);
+   // console.log(`Download [${downloadId}] Progress: ${progress * 100}%`);
   }
 
   // Public method to start a new download

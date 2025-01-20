@@ -2,21 +2,14 @@ import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import { getMedia } from "@/api/mediaHelper";
-import { MediaSystem } from "./useFileSystem";
-import { IUnsafeZoneResponse } from "@/components/componentTypes";
-import { useSession } from "@/context/AuthContext";
+// import { MediaSystem } from "./useFileSystem";
+import { IUnsafeZoneResponse, MediaItem } from "@/components/componentTypes";
 
-const mediaSystem = new MediaSystem();
-
-export interface MediaItem {
-  type: "image" | "video";
-  uri: string;
-}
+// const mediaSystem = new MediaSystem();
 
 export const useMediaManagement = () => {
   const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
-  const { userData } = useSession();
 
   const addMediaItem = (newMediaItem: MediaItem) => {
     setMediaItems((prevItems) => [...prevItems, newMediaItem]);
@@ -64,17 +57,16 @@ export const useMediaManagement = () => {
       let album = await MediaLibrary.getAlbumAsync(albumName);
 
       for (const [index, mediaItem] of itemsToSave.entries()) {
-        // Check if the asset already exists and delete it if necessary
-        const existingAssets = await MediaLibrary.getAssetsAsync({
-          album,
-          mediaType: ["photo", "video"],
-        });
-        const existingAsset = existingAssets.assets.find(
-          (asset) => asset.uri === mediaItem.uri
-        );
-        if (existingAsset) {
-          await MediaLibrary.deleteAssetsAsync([existingAsset.id]);
-        }
+        //const existingAssets = await MediaLibrary.getAssetsAsync({
+        //album,
+        //mediaType: ["photo", "video"],
+        //});
+        //const existingAsset = existingAssets.assets.find(
+        //(asset) => asset.uri === mediaItem.uri
+        //);
+        //if (existingAsset) {
+        //await MediaLibrary.deleteAssetsAsync([existingAsset.id]);
+        //}
 
         const asset = await MediaLibrary.createAssetAsync(mediaItem.uri);
 
@@ -98,7 +90,7 @@ export const useMediaManagement = () => {
 
   const getZoneMedia = async (
     zone: IUnsafeZoneResponse,
-    checkAndDownload = true
+    checkMedia = true
   ): Promise<MediaItem[] | undefined> => {
     try {
       if (!zone) return;
@@ -106,90 +98,79 @@ export const useMediaManagement = () => {
       const hasPermission = await mediaPermission();
       if (!hasPermission) return;
 
-      if (checkAndDownload) await checkAndDownloadMedia(zone);
+      if (checkMedia) {
+        const missingMediaItems = await checkMissingMediaLinks(zone);
 
-      const albumName = `Zone-${zone._id}`;
-      const album = await MediaLibrary.getAlbumAsync(albumName);
-      if (!album) return;
-      const assets = await MediaLibrary.getAssetsAsync({
-        album,
-        mediaType: ["photo", "video"],
-      });
+        const albumName = `Zone-${zone._id}`;
+        const album = await MediaLibrary.getAlbumAsync(albumName);
+        if (!album) {
+          return missingMediaItems;
+        }
+        const assets = await MediaLibrary.getAssetsAsync({
+          album,
+          mediaType: ["photo", "video"],
+        });
 
-      return assets.assets.map((asset) => ({
-        uri: asset.uri,
-        type: asset.mediaType === "photo" ? "image" : "video",
-      }));
+        const localMediaItems = assets.assets.map((asset) => ({
+          uri: asset.uri,
+          type: asset.mediaType === "photo" ? "image" : "video",
+        })) as MediaItem[];
+        const combinedMediaItems = [
+          ...localMediaItems,
+          ...(missingMediaItems || []),
+        ];
+        return combinedMediaItems;
+      } else {
+        const missingMediaItems = await checkMissingMediaLinks(zone);
+        if (missingMediaItems) {
+          return missingMediaItems;
+        }
+      }
     } catch (error) {
       console.error("Error getting zone media:", error);
     }
   };
 
-  const checkAndDownloadMedia = async (zone: IUnsafeZoneResponse) => {
+  const checkMissingMediaLinks = async (zone: IUnsafeZoneResponse) => {
     try {
-      if (zone.markedBy !== userData.id)  return;
-
-
       const response = await getMedia(zone._id);
       if (!response) return;
 
       const remoteMediaItems = response.flatMap((zone: any) =>
         zone.media.map((item: any) => ({
-          url: item.url,
+          uri: item.url,
           type: item.mediaType === "image/jpeg" ? "image" : "video",
         }))
-      );
+      ) as MediaItem[];
 
-      let downloadedItems: MediaItem[] = [];
       let localMediaItems: MediaItem[] | undefined;
 
       const albumName = `Zone-${zone._id}`;
       let album = await MediaLibrary.getAlbumAsync(albumName);
 
       if (album) {
-        localMediaItems = await getZoneMedia(zone, false);
+        const assets = await MediaLibrary.getAssetsAsync({
+          album,
+          mediaType: ["photo", "video"],
+        });
+        localMediaItems = assets.assets.map((asset) => ({
+          uri: asset.uri,
+          type: asset.mediaType === "photo" ? "image" : "video",
+        }));
         const missingMediaItems = remoteMediaItems.filter((remoteItem) => {
-          const remoteFilename = extractFilename(remoteItem.url);
+          const remoteFilename = extractFilename(remoteItem.uri);
           return !localMediaItems?.some((localItem) =>
             localItem.uri.includes(remoteFilename)
           );
         });
         if (missingMediaItems.length === 0) return;
 
-        for (const mediaItem of missingMediaItems) {
-          const { result } = await mediaSystem.startDownload(
-            mediaItem.url,
-            extractFilename(mediaItem.url)
-          );
-          if (result) {
-            const newMediaItem: MediaItem = {
-              type: mediaItem.type as "image" | "video",
-              uri: result.uri,
-            };
-            downloadedItems.push(newMediaItem);
-          }
-        }
-        await saveMedia(downloadedItems, zone._id);
-        return;
+        return missingMediaItems;
       } else {
-        for (const remoteItem of remoteMediaItems) {
-          const { result } = await mediaSystem.startDownload(
-            remoteItem.url,
-            extractFilename(remoteItem.url)
-          );
-          if (result) {
-            const newMediaItem: MediaItem = {
-              type: remoteItem.type as "image" | "video",
-              uri: result.uri,
-            };
-            downloadedItems.push(newMediaItem);
-          }
-        }
-        await saveMedia(downloadedItems, zone._id);
-        return;
+        return remoteMediaItems;
       }
     } catch (error) {
-      console.error("Error checking and downloading media:", error);
+      console.error("Error checking missing media links:", error);
     }
   };
 

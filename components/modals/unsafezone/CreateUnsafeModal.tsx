@@ -47,11 +47,11 @@ import {
   UnsafeZoneSchema,
   UnsafeZoneSchemaType,
 } from "@/components/forms/schemas/UnsafeZoneSchema";
-import { IUnsafeZoneRequest } from "@/components/componentTypes";
+import { IUnsafeZoneRequest, MediaItem } from "@/components/componentTypes";
 import { useSession } from "@/context/AuthContext";
 import { useLocationAndUnsafeZones } from "@/hooks/useUnsafeZones";
 import { uploadMedia } from "@/api/mediaHelper";
-import { useMediaManagement, MediaItem } from "@/hooks/useMediaManagement";
+import { useMediaManagement } from "@/hooks/useMediaManagement";
 
 interface CreateUnsafeZoneModalProps {
   isOpen: boolean;

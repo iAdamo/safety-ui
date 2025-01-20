@@ -298,7 +298,7 @@ const SignUp = () => {
           <Button
             className="bg-IndianRed w-52 data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
             size="md"
-            onPress={() => router.push("/auth/signin")}
+            onPress={() => router.replace("/auth/signin")}
           >
             <ButtonText>Sign In</ButtonText>
           </Button>

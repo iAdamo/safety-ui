@@ -3,104 +3,90 @@ import { Platform } from "react-native";
 import * as Location from "expo-location";
 import { useStorageState } from "@/utils/UseStorageState";
 import { getUnsafeZone, getUserUnsafeZones } from "@/api/unsafeZoneHelper";
-import { IUnsafeZoneResponse } from "@/components/componentTypes";
+import { IUnsafeZoneResponse, LocationData } from "@/components/componentTypes";
 import { useSession } from "@/context/AuthContext";
-
-type LocationData = {
-  latitude: number;
-  longitude: number;
-} | null;
 
 export function useLocationAndUnsafeZones() {
   const { userData } = useSession();
-  const [location, setLocation] = useState<LocationData>(null);
-  const [locationError, setError] = useState<string | null>(null);
-  const [loadingLocation, setLoadingLocation] = useState(true);
+  const [location, setLocation] = useState<LocationData | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+
   const [[loadingZone, unsafeZones], setUnsafeZones] =
     useStorageState<IUnsafeZoneResponse[]>("unsafeZones");
-  const [[loading, userUnsafeZones], setUserUnsafeZones] =
+  const [[loadingUserZones, userUnsafeZones], setUserUnsafeZones] =
     useStorageState<IUnsafeZoneResponse[]>("userUnsafeZones");
 
   const requestLocationPermission = async () => {
     setLoadingLocation(true);
-    if (Platform.OS === "web") {
-      // Browser Geolocation API
-      if (!navigator.geolocation) {
-        setError("Geolocation is not supported by this browser.");
-        setLoadingLocation(false);
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-          setError(null);
-          setLoadingLocation(false);
-        },
-        (error) => {
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              setError("User denied the request for Geolocation.");
-              break;
-            case error.POSITION_UNAVAILABLE:
-              setError("Location information is unavailable.");
-              break;
-            case error.TIMEOUT:
-              setError("The request to get user location timed out.");
-              break;
-            default:
-              setError("An unknown error occurred.");
-          }
-          setLoadingLocation(false);
+    try {
+      if (Platform.OS === "web") {
+        // Browser Geolocation API
+        if (!navigator.geolocation) {
+          throw new Error("Geolocation is not supported by this browser.");
         }
-      );
-    } else {
-      // React Native with expo-location
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setError("This app requires location access to function properly.");
-          setLoadingLocation(false);
-          return;
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setLocation({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+            setLocationError(null);
+            setLoadingLocation(false);
+          },
+          (error) => {
+            const errorMessage =
+              error.code === error.PERMISSION_DENIED
+                ? "User denied the request for Geolocation."
+                : error.code === error.POSITION_UNAVAILABLE
+                ? "Location information is unavailable."
+                : error.code === error.TIMEOUT
+                ? "The request to get user location timed out."
+                : "An unknown error occurred.";
+            setLocationError(errorMessage);
+            setLoadingLocation(false);
+          }
+        );
+      } else {
+        // React Native with expo-location
+        const { status: foregroundStatus } =
+          await Location.requestForegroundPermissionsAsync();
+
+        if (foregroundStatus !== "granted") {
+          throw new Error("Foreground location permission not granted.");
         }
 
         const currentLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.High,
+          accuracy: Location.Accuracy.BestForNavigation,
         });
+
         setLocation({
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
         });
-        setError(null);
-      } catch (error) {
-        setError("Failed to get location. Please try again.");
-      } finally {
+        setLocationError(null);
         setLoadingLocation(false);
       }
+    } catch (error) {
+      setLocationError(String(error));
+      setLoadingLocation(false);
     }
   };
 
   const fetchUserUnsafeZones = async () => {
-    if (userData.id) {
+    if (userData?.id) {
       try {
         const response = await getUserUnsafeZones(userData.id);
-        if (response) {
-          console.log("jeelloo");
-          setUserUnsafeZones(response);
-        }
+        if (response) setUserUnsafeZones(response);
       } catch (error) {
         console.error("Error fetching user unsafe zones:", error);
       }
     }
   };
 
-
-
   const fetchUnsafeZones = useCallback(async () => {
-    if (userData.id && location) {
+    if (userData?.id && location) {
       setLoadingLocation(true);
       try {
         const response = await getUnsafeZone(userData.id, {
@@ -108,29 +94,16 @@ export function useLocationAndUnsafeZones() {
           userLong: location.longitude,
           proximity: userData.proximity,
         });
-        if (response) {
-          setUnsafeZones(response);
-          setLoadingLocation(false);
-        }
+        if (response) setUnsafeZones(response);
       } catch (error) {
         console.error("Error fetching unsafe zones:", error);
+      } finally {
+        setLoadingLocation(false);
       }
     }
   }, [userData?.id, location, setUnsafeZones]);
 
-  useEffect(() => {
-    requestLocationPermission();
-  }, []);
-
-  //useEffect(() => {
-    //if (location) {
-      // fetchUnsafeZones();
-      //const intervalId = setInterval(fetchUnsafeZones, 300000);
-      //return () => clearInterval(intervalId);
-    //}
-  //}, [location, fetchUnsafeZones]);
-
-  const resetError = () => setError(null);
+  const resetError = () => setLocationError(null);
 
   return {
     location,

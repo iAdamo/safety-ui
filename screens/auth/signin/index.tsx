@@ -235,7 +235,7 @@ const Login = () => {
         <Button
           className="bg-Teal w-52 data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
           size="md"
-          onPress={() => router.push("/auth/signup")}
+          onPress={() => router.replace("/auth/signup")}
         >
           <ButtonText>Create New Account</ButtonText>
         </Button>

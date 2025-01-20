@@ -1,21 +1,13 @@
 import React from "react";
 import { useEvent } from "expo";
 import { useVideoPlayer, VideoView } from "expo-video";
-import { Pressable } from "react-native";
-import {
-  Box,
-  Text,
-  VStack,
-  Heading,
-  Button,
-  ButtonText,
-} from "@/components/ui";
+import { StyleSheet, View, Button } from "react-native";
 
-interface VideoPlayerProps {
+interface VideoScreenProps {
   source: string;
 }
 
-export const VideoPlayer: React.FC<VideoPlayerProps> = ({ source }) => {
+export const VideoScreen: React.FC<VideoScreenProps> = ({ source }) => {
   const player = useVideoPlayer(source, (player) => {
     // player.loop = true;
     // player.play();
@@ -26,15 +18,26 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ source }) => {
   });
 
   return (
-    <VStack className="flex-1 flex-col items-center  justify-center space-y-4">
-      {/* Video View */}
+    <View style={styles.contentContainer}>
       <VideoView
-        style={{ width: "100%", aspectRatio: 1 / 1 }}
+        style={styles.video}
         player={player}
         allowsFullscreen
         allowsPictureInPicture
-        className="rounded-lg overflow-hidden"
       />
-    </VStack>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  contentContainer: {
+    flex: 1,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  video: {
+    width: 320,
+    height: 550,
+  },
+});
