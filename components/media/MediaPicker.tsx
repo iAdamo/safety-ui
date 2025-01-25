@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { MediaPreview } from "./MediaPreview";
 import { Image } from "expo-image";
-import { VideoPlayer } from "./VideoScreen";
+import { VideoScreen } from "./VideoScreen";
 import { CameraView } from "expo-camera";
 import { AlertModal } from "../modals/Alert/AlertModal";
 import {
@@ -29,8 +29,9 @@ import {
   ModalBackdrop,
 } from "@/components/ui";
 import { usePermissions } from "@/hooks/usePermissions";
-import { useMediaManagement, MediaItem } from "@/hooks/useMediaManagement";
+import { useMediaManagement } from "@/hooks/useMediaManagement";
 import { CameraControls } from "@/components/media/CameraControls";
+import { MediaItem } from "@/components/componentTypes";
 
 interface MediaPickerProps {
   onMediaSelect: (mediaItem: MediaItem[]) => void;
@@ -64,7 +65,7 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
   // Open camera
   const openCamera = async () => {
     if (!cameraPermission || !microphonePermission) {
-      return <Box />;
+      return;
     }
 
     if (!cameraPermission.granted || !microphonePermission.granted) {
@@ -171,7 +172,7 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
                 <Image source={{ uri: item.uri }} style={styles.media} />
               ) : (
                 <View style={styles.videoContainer}>
-                  <VideoPlayer source={item.uri} />
+                  <VideoScreen source={item.uri} />
                   <TouchableOpacity
                     style={styles.playButton}
                     onPress={() => console.log("Play video")}
@@ -261,7 +262,7 @@ export const MediaPicker = ({ onMediaSelect }: MediaPickerProps) => {
             requestMicrophonePermission(),
             setPermissionError(false);
         }}
-        buttonOneText="Grant Permission"
+        buttonOneText="Allow"
         buttonTwoText="Exit"
       />
     </VStack>

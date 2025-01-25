@@ -28,3 +28,4 @@ export * from "./fab";
 export * from "./pressable";
 export * from "./popover";
 export * from "./progress";
+export * from "./checkbox";

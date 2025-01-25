@@ -33,6 +33,7 @@ import {
   Link,
   LinkText,
 } from "@/components/ui";
+import { LocationPermissionsWithPolicy } from "@/screens/dashboard/feeds/LocationPolicy";
 
 import { EyeIcon, EyeOffIcon } from "@/components/ui";
 import { Keyboard } from "react-native";
@@ -118,6 +119,7 @@ const Login = () => {
 
   return (
     <Box className="flex-1">
+      <LocationPermissionsWithPolicy />
       <SafeAreaView className="md:hidden flex h-48 bg-IndianRed"></SafeAreaView>
       <Box className="hidden md:flex md:flex-col md:w-1/4 md:h-full md:bg-IndianRed md:fixed md:left-0 z-20"></Box>
       <StatusBar style="auto" translucent={false} backgroundColor={"#CD5C5C"} />
@@ -223,14 +225,14 @@ const Login = () => {
           </VStack>
           <HStack>
             <Link onPress={() => setShowForgotPasswordModal(true)}>
-              <LinkText className="font-medium text-sm text-primary-700 group-hover/link:text-primary-600">
+              <LinkText className="font-extrabold text-md text-primary-300 group-hover/link:text-primary-600">
                 Forgot Password?
               </LinkText>
             </Link>
           </HStack>
         </VStack>
       </VStack>
-      <VStack className="flex-1 justify-center items-center md:ml-80">
+      <VStack className="flex-1 justify-center items-center gap-2 md:ml-80">
         <Text size="md">Don't have an account?</Text>
         <Button
           className="bg-Teal w-52 data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
@@ -241,11 +243,11 @@ const Login = () => {
         </Button>
       </VStack>
       <Center className="md:ml-80">
-        <Text size="2xs" className="text-primary-100">
+        <Text size="sm" className="text-primary-100">
           Powered By
         </Text>
-        <Text size="2xs" className="text-primary-100">
-          Sanux Technologies
+        <Text size="sm" className="text-primary-100">
+          Kajola Industries
         </Text>
       </Center>
 

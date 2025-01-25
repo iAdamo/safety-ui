@@ -71,8 +71,7 @@ export const AlertModal: React.FC<IAlertDialog> = ({
         <AlertDialogFooter className="justify-between">
           {buttonOnePress && (
             <Button
-              className="w-1/3 bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
-              action="secondary"
+              className="bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
               onPress={buttonOnePress}
               size="sm"
             >
@@ -81,7 +80,7 @@ export const AlertModal: React.FC<IAlertDialog> = ({
           )}
           {buttonTwoPress && (
             <Button
-              className="w-1/3 bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
+              className="bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
               size="sm"
               onPress={buttonTwoPress}
             >
