@@ -3,7 +3,7 @@ import { StatusBar } from "react-native";
 
 const Loader = () => {
   return (
-    <Center className="flex-1 bg-IndianRed">
+    <VStack className="flex-1 bg-IndianRed">
       <StatusBar
         barStyle="dark-content"
         translucent={true}
@@ -25,7 +25,7 @@ const Loader = () => {
           Sanux Technologies
         </Text>
       </Center>
-    </Center>
+    </VStack>
   );
 };
 

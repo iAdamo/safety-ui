@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import * as Location from "expo-location";
+import { Redirect } from "expo-router";
 import {
   HStack,
   VStack,
@@ -28,18 +29,21 @@ export function LocationPermissionsWithPolicy() {
     Location.useBackgroundPermissions();
   const [showPolicyModal, setShowPolicyModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [redirectToFeeds, setRedirectToFeeds] = useState(false);
 
-  const [[loading, doNotAskAgain], setDoNotAskAgainStorage] = useStorageState<
-    boolean | undefined
-  >("doNotAskAgain");
+  const [[loading, doNotAskAgain], setDoNotAskAgain] =
+    useStorageState<boolean>("doNotAskAgain");
 
   useEffect(() => {
     const checkPermissions = async () => {
       try {
         if (loading) return;
-        // Check if background permission is already granted
-        if (backgroundStatus?.status !== "granted" && !doNotAskAgain) {
+        if (!backgroundStatus?.granted && !doNotAskAgain) {
           setShowPolicyModal(true);
+        } else if (backgroundStatus?.granted) {
+          setRedirectToFeeds(true);
+        } else {
+          setError("Background location permission was rejected.");
         }
       } catch (err) {
         setError(String(err));
@@ -54,32 +58,43 @@ export function LocationPermissionsWithPolicy() {
 
     try {
       // Request foreground permissions first
-      const { status: fgStatus } = await requestForegroundPermissions();
-      if (fgStatus !== "granted") {
-        setError("Foreground location permission is required.");
-        return;
-      }
+      if (!foregroundStatus?.granted) {
+        const { status: fgStatus } = await requestForegroundPermissions();
+        if (fgStatus !== "granted") {
+          setError("Foreground location permission is required.");
+          return;
+        }
 
-      // Request background permissions
-      const { status: bgStatus } = await requestBackgroundPermissions();
-      if (bgStatus !== "granted") {
-        setError("Background location permission not granted.");
-      } else {
-        setError(null);
+        if (!backgroundStatus?.granted) {
+          // Request background permissions
+          const { status: bgStatus } = await requestBackgroundPermissions();
+          if (bgStatus !== "granted") {
+            setError("Background location permission not granted.");
+          } else {
+            setError(null);
+          }
+        }
       }
     } catch (err) {
       setError(String(err));
     }
+
+    setRedirectToFeeds(true);
   };
 
   const handleRejectPolicy = () => {
     setShowPolicyModal(false);
     setError("Background location permission was rejected.");
+    setRedirectToFeeds(true);
   };
 
-  const toggleDoNotAskAgain = () => {
-    setDoNotAskAgainStorage(!doNotAskAgain);
+  const toggleaskAgain = () => {
+    setDoNotAskAgain(!doNotAskAgain);
   };
+
+  if (redirectToFeeds) {
+    return <Redirect href="/dashboard/feeds" />;
+  }
 
   return (
     <VStack>
@@ -179,7 +194,7 @@ export function LocationPermissionsWithPolicy() {
             <Checkbox
               value="doNotAskAgain"
               isChecked={doNotAskAgain ?? false}
-              onChange={toggleDoNotAskAgain}
+              onChange={toggleaskAgain}
               className="mt-4"
             >
               <CheckboxIndicator>
@@ -189,14 +204,14 @@ export function LocationPermissionsWithPolicy() {
             </Checkbox>
             <HStack className="mt-4 justify-between w-full">
               <Button
-                className="w-[45%] bg-teal-500 hover:bg-teal-600 active:bg-teal-700"
+                className="w-[45%] bg-teal-500 data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
                 onPress={handleAcceptPolicy}
                 size="md"
               >
                 <ButtonText>I Understand</ButtonText>
               </Button>
               <Button
-                className="w-[45%] bg-red-500 hover:bg-red-600 active:bg-red-700"
+                className="w-[45%] bg-red-500 data-[hover=true]:bg-red-600 data-[active=true]:bg-red-700"
                 size="md"
                 onPress={handleRejectPolicy}
               >

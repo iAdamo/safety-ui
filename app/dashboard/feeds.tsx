@@ -1,2 +1,2 @@
-import { Feeds } from "../../screens/dashboard/feeds";
+import { Feeds } from "@/screens/dashboard/feeds";
 export default Feeds;

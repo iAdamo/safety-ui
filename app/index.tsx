@@ -8,11 +8,11 @@ const Index = () => {
   useEffect(() => {
     setTimeout(() => {
       router.replace("auth/signin" as any);
-    }, 1000);
+    }, 100);
   }, []);
 
   return (
-    <Center className="flex-1 bg-IndianRed">
+    <VStack className="flex-1 bg-IndianRed">
       <StatusBar
         barStyle="dark-content"
         translucent={true}
@@ -34,7 +34,7 @@ const Index = () => {
           Sanux Technologies
         </Text>
       </Center>
-    </Center>
+    </VStack>
   );
 };
 

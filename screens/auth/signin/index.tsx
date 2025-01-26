@@ -33,7 +33,6 @@ import {
   Link,
   LinkText,
 } from "@/components/ui";
-import { LocationPermissionsWithPolicy } from "@/screens/dashboard/feeds/LocationPolicy";
 
 import { EyeIcon, EyeOffIcon } from "@/components/ui";
 import { Keyboard } from "react-native";
@@ -119,7 +118,6 @@ const Login = () => {
 
   return (
     <Box className="flex-1">
-      <LocationPermissionsWithPolicy />
       <SafeAreaView className="md:hidden flex h-48 bg-IndianRed"></SafeAreaView>
       <Box className="hidden md:flex md:flex-col md:w-1/4 md:h-full md:bg-IndianRed md:fixed md:left-0 z-20"></Box>
       <StatusBar style="auto" translucent={false} backgroundColor={"#CD5C5C"} />

@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  HStack,
   AlertDialog,
   AlertDialogBackdrop,
   AlertDialogContent,
@@ -61,32 +62,34 @@ export const AlertModal: React.FC<IAlertDialog> = ({
       isKeyboardDismissable={isKeyboardDismissable}
     >
       <AlertDialogBackdrop />
-      <AlertDialogContent>
-        <AlertDialogHeader>
+      <AlertDialogContent className="gap-2">
+        <AlertDialogHeader className="justify-center">
           <Heading>{headerText}</Heading>
         </AlertDialogHeader>
         <AlertDialogBody>
           <Text className="text-center">{bodyText}</Text>
         </AlertDialogBody>
-        <AlertDialogFooter className="justify-between">
-          {buttonOnePress && (
-            <Button
-              className="bg-Teal data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
-              onPress={buttonOnePress}
-              size="sm"
-            >
-              <ButtonText>{buttonOneText}</ButtonText>
-            </Button>
-          )}
-          {buttonTwoPress && (
-            <Button
-              className="bg-IndianRed data-[hover=true]:bg-IndianRed-600 data-[active=true]:bg-IndianRed-700"
-              size="sm"
-              onPress={buttonTwoPress}
-            >
-              <ButtonText>{buttonTwoText}</ButtonText>
-            </Button>
-          )}
+        <AlertDialogFooter>
+          <HStack className="mt-4 justify-between w-full">
+            {buttonOnePress && (
+              <Button
+                className="w-[45%] bg-teal-500 data-[hover=true]:bg-teal-600 data-[active=true]:bg-teal-700"
+                onPress={buttonOnePress}
+                size="sm"
+              >
+                <ButtonText>{buttonOneText}</ButtonText>
+              </Button>
+            )}
+            {buttonTwoPress && (
+              <Button
+                className="w-[45%] bg-red-500 data-[hover=true]:bg-red-600 data-[active=true]:bg-red-700"
+                size="sm"
+                onPress={buttonTwoPress}
+              >
+                <ButtonText>{buttonTwoText}</ButtonText>
+              </Button>
+            )}
+          </HStack>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

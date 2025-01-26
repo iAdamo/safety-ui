@@ -1,16 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
-import { Platform } from "react-native";
+import { Linking, Platform, Alert } from "react-native";
 import * as Location from "expo-location";
 import { useStorageState } from "@/utils/UseStorageState";
 import { getUnsafeZone, getUserUnsafeZones } from "@/api/unsafeZoneHelper";
 import { IUnsafeZoneResponse, LocationData } from "@/components/componentTypes";
 import { useSession } from "@/context/AuthContext";
+import { useLocationAndBackgroundFetch } from "@/hooks/BgLocationUpdate";
 
 export function useLocationAndUnsafeZones() {
   const { userData } = useSession();
   const [location, setLocation] = useState<LocationData | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
+  const { bgLocation, stopBackgroundLocationUpdates } =
+    useLocationAndBackgroundFetch();
+  const [backgroundStatus, requestBackgroundPermissions] =
+    Location.useBackgroundPermissions();
+  const [foregroundStatus, requestForegroundPermissions] =
+    Location.useBackgroundPermissions();
 
   const [[loadingZone, unsafeZones], setUnsafeZones] =
     useStorageState<IUnsafeZoneResponse[]>("unsafeZones");
@@ -50,23 +57,34 @@ export function useLocationAndUnsafeZones() {
         );
       } else {
         // React Native with expo-location
-        const { status: foregroundStatus } =
-          await Location.requestForegroundPermissionsAsync();
-
-        if (foregroundStatus !== "granted") {
-          throw new Error("Foreground location permission not granted.");
+        if (!foregroundStatus?.granted) {
+          const { status: fgStatus } =
+            await Location.requestForegroundPermissionsAsync();
+          if (fgStatus !== "granted") {
+            throw new Error("Foreground location permission not granted.");
+          }
+        } else if (!(await Location.hasServicesEnabledAsync())) {
+          throw new Error(
+            "Location services are disabled. Please enable location services to continue."
+          );
         }
 
-        const currentLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.BestForNavigation,
-        });
+        if (backgroundStatus) {
+          if (!backgroundStatus.granted) {
+            stopBackgroundLocationUpdates().then(async () => {
+              const currentLocation = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.BestForNavigation,
+              });
 
-        setLocation({
-          latitude: currentLocation.coords.latitude,
-          longitude: currentLocation.coords.longitude,
-        });
-        setLocationError(null);
-        setLoadingLocation(false);
+              setLocation({
+                latitude: currentLocation.coords.latitude,
+                longitude: currentLocation.coords.longitude,
+              });
+              setLocationError(null);
+              setLoadingLocation(false);
+            });
+          }
+        }
       }
     } catch (error) {
       setLocationError(String(error));
