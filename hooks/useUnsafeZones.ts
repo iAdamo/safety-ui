@@ -5,14 +5,14 @@ import { useStorageState } from "@/utils/UseStorageState";
 import { getUnsafeZone, getUserUnsafeZones } from "@/api/unsafeZoneHelper";
 import { IUnsafeZoneResponse, LocationData } from "@/components/componentTypes";
 import { useSession } from "@/context/AuthContext";
-import { useLocationAndBackgroundFetch } from "@/hooks/BgLocationUpdate";
+import { useLocationAndBackgroundFetch } from "@/hooks/bgLocationManager";
 
 export function useLocationAndUnsafeZones() {
   const { userData } = useSession();
   const [location, setLocation] = useState<LocationData | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
-  const { bgLocation, stopBackgroundLocationUpdates } =
+  const { stopBackgroundLocationUpdates } =
     useLocationAndBackgroundFetch();
   const [backgroundStatus, requestBackgroundPermissions] =
     Location.useBackgroundPermissions();

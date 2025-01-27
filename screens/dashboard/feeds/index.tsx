@@ -9,8 +9,9 @@ import UnsafeZones from "@/components/UnsafeZones";
 import { useRouter } from "expo-router";
 import { useSignOut } from "@/hooks/useSignOut";
 import { CreateUnsafeModal } from "@/components/modals/unsafezone/CreateUnsafeModal";
-import { useLocationAndBackgroundFetch } from "@/hooks/BgLocationUpdate";
 import * as Location from "expo-location";
+import { locationStateManager } from "@/utils/LocationStateManager";
+import { useLocationAndBackgroundFetch } from "@/hooks/bgLocationManager";
 import {
   PlusIcon,
   MapPinIcon,
@@ -39,7 +40,7 @@ const Feeds = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [backgroundStatus] = Location.useBackgroundPermissions();
   const {
-    location,
+    location: fgLocation,
     loadingZone,
     fetchUnsafeZones,
     loadingLocation,
@@ -49,7 +50,13 @@ const Feeds = () => {
   } = useLocationAndUnsafeZones();
   const [showLocationError, setShowLocationError] = useState(false);
   const [showMyUnsafeZone, setShowMyUnsafeZone] = useState(false);
-  const { bgLocation } = useLocationAndBackgroundFetch();
+  const [location, setLocation] = useState(locationStateManager.getLocation());
+  
+
+  useEffect(() => {
+    const unsubscribe = locationStateManager.subscribe(setLocation);
+    return () => unsubscribe(); // Cleanup subscription on unmount
+  }, []);
 
   useEffect(() => {
     requestLocationPermission();
@@ -65,7 +72,7 @@ const Feeds = () => {
 
   useEffect(() => {
     fetchUnsafeZones();
-  }, [fetchUnsafeZones, location, bgLocation]);
+  }, [fetchUnsafeZones, fgLocation, location]);
 
   const handleCloseModal = (_id: string) => {
     setModalVisible((prev) => ({ ...prev, [_id]: false }));
@@ -80,7 +87,7 @@ const Feeds = () => {
 
   return (
     <VStack className="flex-1">
-      {!location && !bgLocation ? (
+      {!fgLocation && !location ? (
         <Loader />
       ) : (
         <Box className="flex-1">
@@ -92,7 +99,7 @@ const Feeds = () => {
           <SafeAreaView className="h-40 bg-SteelBlue border-0 shadow-hard-5-indianred"></SafeAreaView>
           <VStack className="flex-1 px-5 bg-red-200 pb-16">
             <Text>
-              {bgLocation?.latitude} {bgLocation?.longitude}
+              {location?.latitude} {location?.longitude}
             </Text>
             {/** my unsafe zone */}
             {showMyUnsafeZone && <MyUnsafeZone />}
@@ -198,11 +205,11 @@ const Feeds = () => {
               </Box>
             </VStack>
             {/** Create an unsafe zone */}
-            {(location || bgLocation) && (
+            {(fgLocation || location) && (
               <CreateUnsafeModal
                 isOpen={showEditModal}
                 onClose={() => setShowEditModal(false)}
-                location={location || bgLocation!}
+                location={fgLocation || location!}
               />
             )}
           </Box>

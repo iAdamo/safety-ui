@@ -1,7 +1,7 @@
-import React, { useState, ReactNode } from "react";
 import { useContext, createContext, type PropsWithChildren } from "react";
 import { useStorageState } from "@/utils/UseStorageState";
 import { loginUser, logoutUser } from "@/api/authHelper";
+import { useLocationAndBackgroundFetch } from "@/hooks/bgLocationManager";
 
 interface AuthContextProps {
   userData?: any;
@@ -29,6 +29,8 @@ export function SessionProvider({ children }: PropsWithChildren<{}>) {
   const [[isLoading, session], setSession] = useStorageState<string>("session");
   const [[loading, userData], setUserData] = useStorageState<any>("user");
 
+  const { stopBackgroundLocationUpdates } = useLocationAndBackgroundFetch();
+
   return (
     <AuthContext.Provider
       value={{
@@ -41,13 +43,15 @@ export function SessionProvider({ children }: PropsWithChildren<{}>) {
             }
           } catch (e) {
             console.error("Error logging in:", e);
-            throw e; // Rethrow the error to be caught by the caller
+            throw e;
           }
         },
         logout: () => {
-          logoutUser();
-          setSession(null);
-          setUserData(null);
+          stopBackgroundLocationUpdates().then(async () => {
+            logoutUser();
+            setSession(null);
+            setUserData(null);
+          });
         },
         userData,
         session,

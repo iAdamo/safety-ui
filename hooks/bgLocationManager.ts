@@ -2,26 +2,24 @@ import { useEffect, useState } from "react";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import { LocationData } from "@/components/componentTypes";
+import { locationStateManager } from "../utils/LocationStateManager";
 
 const LOCATION_TASK_NAME = "background-location-task";
-
-let setBgLocation: React.Dispatch<React.SetStateAction<LocationData | null>>;
 
 TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   if (error) {
     console.error("Background task error:", error);
     return;
   }
+
   if (data) {
     const { locations } = data as { locations: Location.LocationObject[] };
     if (locations && locations.length > 0) {
       const latestLocation = locations[0];
-      if (setBgLocation) {
-        setBgLocation({
-          latitude: latestLocation.coords.latitude,
-          longitude: latestLocation.coords.longitude,
-        });
-      }
+      locationStateManager.setLocation({
+        latitude: latestLocation.coords.latitude,
+        longitude: latestLocation.coords.longitude,
+      });
     }
   }
 });
@@ -33,8 +31,6 @@ export function useLocationAndBackgroundFetch() {
     Location.useBackgroundPermissions();
 
   useEffect(() => {
-    setBgLocation = setLocation;
-
     const startBackgroundLocationUpdates = async () => {
       try {
         const hasStarted = await Location.hasStartedLocationUpdatesAsync(
@@ -55,13 +51,13 @@ export function useLocationAndBackgroundFetch() {
           }
         }
       } catch (error) {
-        console.error("Error starting background location updates:", error);
+        console.error(error);
         setError(error);
       }
     };
 
     startBackgroundLocationUpdates();
-  }, [backgroundStatus]);
+  }, [backgroundStatus, error]);
 
   const stopBackgroundLocationUpdates = async () => {
     const hasStarted = await Location.hasStartedLocationUpdatesAsync(
@@ -73,5 +69,5 @@ export function useLocationAndBackgroundFetch() {
     }
   };
 
-  return { bgLocation, error, stopBackgroundLocationUpdates };
+  return { error, stopBackgroundLocationUpdates };
 }

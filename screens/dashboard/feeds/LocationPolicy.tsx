@@ -30,6 +30,7 @@ export function LocationPermissionsWithPolicy() {
   const [showPolicyModal, setShowPolicyModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [redirectToFeeds, setRedirectToFeeds] = useState(false);
+  const [understand, setUnderstand] = useState(false);
 
   const [[loading, doNotAskAgain], setDoNotAskAgain] =
     useStorageState<boolean>("doNotAskAgain");
@@ -40,7 +41,9 @@ export function LocationPermissionsWithPolicy() {
         if (loading) return;
         if (!backgroundStatus?.granted && !doNotAskAgain) {
           setShowPolicyModal(true);
-        } else if (backgroundStatus?.granted) {
+        } else if (!doNotAskAgain) {
+          return;
+        } else if (backgroundStatus?.granted && !understand) {
           setRedirectToFeeds(true);
         } else {
           setError("Background location permission was rejected.");
@@ -54,6 +57,7 @@ export function LocationPermissionsWithPolicy() {
   }, [backgroundStatus, doNotAskAgain, loading]);
 
   const handleAcceptPolicy = async () => {
+    setUnderstand(true);
     setShowPolicyModal(false);
 
     try {
