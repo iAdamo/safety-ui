@@ -38,7 +38,6 @@ export function LocationPermissionsWithPolicy() {
   useEffect(() => {
     const checkPermissions = async () => {
       try {
-        if (loading) return;
         if (!backgroundStatus?.granted && !doNotAskAgain) {
           setShowPolicyModal(true);
         } else if (!doNotAskAgain) {
